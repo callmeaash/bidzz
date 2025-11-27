@@ -51,8 +51,10 @@ function checkPassword() {
         return false;
     }
 
-    if (password.length < 8) {
-        showError('password', '✗ Password must be at least 8 characters long');
+    const regex = /^(?=.*[0-9]).{8,}$/;
+
+    if (!regex.test(password)) {
+        showError('password', '✗ Password must be 8+ chars & include a number');
         return false;
 
     } else {
