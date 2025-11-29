@@ -6,6 +6,10 @@ class RegisterController{
     public function handle(){
         // Display register form on GET request
         if ($_SERVER['REQUEST_METHOD'] == 'GET'){
+            $errors = $_SESSION['errors'] ?? [];
+            $old = $_SESSION['old'] ?? [];
+
+            unset($_SESSION['errors'], $_SESSION['old']);
             require_once __DIR__ . '/../views/register.php';
             return;
         }
@@ -52,14 +56,19 @@ class RegisterController{
         // If errors exist, load the form and display errors
         if (!empty($errors)) {
             $errorData = $errors;
-            require_once __DIR__ . '/../views/register.php';
+            $_SESSION['errors'] = $errors;
+            $_SESSION['old'] = $_POST;
+            header('Location: register');
             return;
         }
 
         // Insert user into db
         User::create($username, $email, hash_password($password));
-        echo 'success';
+        
+        // Redirect to login route
+        header('Location: login');
 
+        exit;
     }
 }
 ?>

@@ -63,7 +63,7 @@
 
             <button type="submit" class="submit-btn">Create account</button>
 
-            <p class="signin-link">Already have an account? <a href="login.php">Sign in</a></p>
+            <p class="signin-link">Already have an account? <a href="login">Sign in</a></p>
         </form>
     </div>
 

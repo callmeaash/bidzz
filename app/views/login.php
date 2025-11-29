@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../public/css/auth.css">
+    <link rel="stylesheet" href="css/auth.css">
     <title>Auction House - Sign In</title>
 </head>
 <body>
@@ -11,7 +11,7 @@
         <div class="logo-section">
             <div class="logo">
                 <div class="logo-icon">
-                    <img src="../../public/images/logo.png" alt="logo">
+                    <img src="images/logo.png" alt="logo">
                 </div>
                 <span class="logo-text">Bidz</span>
             </div>
@@ -43,10 +43,10 @@
 
             <button type="submit" class="submit-btn">Sign in</button>
 
-            <p class="signin-link">Don't have an account? <a href="register.php">Sign up</a></p>
+            <p class="signin-link">Don't have an account? <a href="register">Sign up</a></p>
         </form>
     </div>
 
-    <script src="../../public/js/auth.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

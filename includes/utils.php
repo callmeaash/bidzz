@@ -4,7 +4,7 @@ function validate_username($username) {
 }
 
 function validate_password($password) {
-    return preg_match("/^(?=.*[0-9]).{6,}$/", $password);
+    return preg_match("/^(?=.*[0-9]).{8,}$/", $password);
 }
 
 function validate_email($email) {
@@ -18,3 +18,5 @@ function hash_password($password) {
 function verify_password($password, $hash) {
     return password_verify($password, $hash);
 }
+
+?>
