@@ -18,8 +18,14 @@ switch($route){
         (new LoginController())->handle();
         break;
 
-    case '':
-        echo "hello";
+    case 'check-username':
+        require_once __DIR__ . '/../app/controllers/ajaxController.php';
+        require_once __DIR__ . '/../includes/db.php';
+        (new AjaxController())->checkUsername();
+        break;
+    
+    default:
+        http_response_code(404);
+        echo "404 - Page not found";
+        break;
 }
-
-?>

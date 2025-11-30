@@ -27,6 +27,23 @@ function clearValidation(fieldId) {
     input.classList.remove('error', 'success');
 }
 
+function checkUsername() {
+    const usernameInput = document.getElementById('username');
+    const username = usernameInput ? usernameInput.value.trim() : '';
+
+    fetch(`/check-username?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.available) {
+                showError('username', data.message);
+            } else {
+                showSuccess('username', data.message);
+            }
+        })
+        .catch(err => console.error(err));
+};
+
+
 function checkEmail() {
     const email = document.getElementById('email').value.trim();
     if (email === '') {
@@ -87,6 +104,13 @@ function togglePassword(inputId) {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 
+// Add ajax to check username availability
+if (document.body.classList.contains('register-page')){
+    const usernameInput = document.getElementById('username');
+    usernameInput.addEventListener('input', checkUsername);
+}
+
+
 // Handle form submission
 const SignupForm = document.getElementById('signup-form');
 if(SignupForm){
@@ -140,10 +164,8 @@ if(SignupForm){
     });
 }
 
-
 // Handle form submission
 const loginForm = document.getElementById('login-form');
-
 if(loginForm){
     document.getElementById('login-form').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent default form submission
