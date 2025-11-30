@@ -18,8 +18,18 @@ class User {
         $this->is_admin = $row['is_admin'];
     }
 
-    public static function findByEmail($email) {
+    private static function getDb() {
         global $mysqli;
+        
+        if ($mysqli === null) {
+            throw new Exception("Database connection not available", 500);
+        }
+        
+        return $mysqli;
+    }
+
+    public static function findByEmail($email) {
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -28,7 +38,7 @@ class User {
     }
 
     public static function findByUsername($username) {
-        global $mysqli;
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -37,7 +47,7 @@ class User {
     }
 
     public static function findById($id) {
-        global $mysqli;
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -46,7 +56,7 @@ class User {
     }
 
     public static function create($username, $email, $password) {
-        global $mysqli;
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("INSERT INTO users (username, password, email) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $username, $password, $email);
         $stmt->execute();

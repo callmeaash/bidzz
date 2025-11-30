@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="css/auth.css">
     <title>Auction House - Create Account</title>
 </head>
-<body>
+<body class="register-page">
     <div class="container">
         <div class="logo-section">
             <div class="logo">
@@ -23,20 +23,53 @@
         <form id="signup-form" method="POST" action="/register">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="aashish">
-                <div id="username-validation" class="validation-message"></div>
+                <input 
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="aashish"
+                    value="<?= htmlspecialchars($old['username'] ?? '') ?>"
+                    class="<?= isset($errors['username']) ? 'error' : '' ?>"
+                >
+                <div
+                    id="username-validation"
+                    class="validation-message <?= isset($errors['username'])? 'error show' : '' ?>"
+                >
+                    <?= $errors['username'] ?? '' ?>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="aashish@example.com" oninput="checkEmail()">
-                <div id="email-validation" class="validation-message"></div>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="aashish@example.com"
+                    value="<?= htmlspecialchars($old['email'] ?? '') ?>""
+                    class="<?= isset($errors['email']) ? 'error' : '' ?>"
+                    oninput="checkEmail()"
+                >
+                <div
+                    id="email-validation"
+                    class="validation-message <?= isset($errors['email'])? 'error show' : '' ?>"
+                >
+                    <?= $errors['email'] ?? '' ?>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Create a password (min. 8 characters)" oninput="checkPassword()">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password (min. 8 characters)"
+                        value="<?= htmlspecialchars($old['email'] ?? '') ?>""
+                        class="<?= isset($errors['password']) ? 'error' : '' ?>"
+                        oninput="checkPassword()"
+                    >
                     <button type="button" class="toggle-password" onclick="togglePassword('password')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -44,13 +77,24 @@
                         </svg>
                     </button>
                 </div>
-                <div id="password-validation" class="validation-message"></div>
+                <div
+                    id="password-validation"
+                    class="validation-message <?= isset($errors['password'])? 'error show' : '' ?>"
+                >
+                    <?= $errors['password'] ?? '' ?>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="confirm-password">Confirm Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm your password" oninput="checkConfirmPassword()">
+                    <input 
+                        type="password"
+                        id="confirm-password"
+                        name="confirm_password"
+                        placeholder="Confirm your password"
+                        class="<?= isset($errors['confirm_password']) ? 'error' : '' ?>"
+                        oninput="checkConfirmPassword()">
                     <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -58,12 +102,17 @@
                         </svg>
                     </button>
                 </div>
-                <div id="confirm-password-validation" class="validation-message"></div>
+                <div
+                    id="confirm-password-validation"
+                    class="validation-message <?= isset($errors['confirm_password'])? 'error show' : '' ?>"
+                >   
+                    <?= $errors['confirm_password'] ?? '' ?>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn">Create account</button>
 
-            <p class="signin-link">Already have an account? <a href="login">Sign in</a></p>
+            <p class="signin-link">Already have an account? <a href="/login">Sign in</a></p>
         </form>
     </div>
 

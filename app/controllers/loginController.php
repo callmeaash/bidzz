@@ -28,23 +28,29 @@ class LoginController{
             $errors['username'] = '✗ Username is required';
         }
 
-        if ($password === ''){
-            $errors['password'] = '✗ Password is required';
-        }
+        try{
+            // Fetch user record from the database
+            $user = User::findByUsername($username);
 
-        // Fetch user record from the database
-        $user = User::findByUsername($username);
+            // Check if the user credientials are correct
+            if ($password === ''){
+                $errors['password'] = '✗ Password is required';
 
-        // Check if the user credientials are correct
-        if (empty($user) || !verify_password($password, $user->password)){
-            $errors['password'] = 'Invalid username or password';
-        
+            } elseif (empty($user) || !verify_password($password, $user->password)){
+                $errors['password'] = '✗ Invalid username or password';
+            }
+
+        } catch (Exception $e){
+            require_once __DIR__ . '/../../includes/utils.php';
+            Logger::error(basename(__FILE__), "Database connection Error", $e->getMessage());
+            $errors['password'] = '🔄 Something went wrong. Please try again.';
         }
 
         if (!empty($errors)){
             $_SESSION['errors'] = $errors;
             $_SESSION['old'] = $_POST;
             header('Location: /login');
+            exit;
         }
 
         // Store the user data in session

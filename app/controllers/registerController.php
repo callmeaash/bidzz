@@ -25,50 +25,63 @@ class RegisterController{
         // Include utility functions
         require_once __DIR__ . '/../../includes/utils.php';
 
-        // Username Validation
-        if ($username === ''){
-            $errors['username'] = '✗ Username is required';
+        try{
+            // Username Validation
+            if ($username === ''){
+                $errors['username'] = '✗ Username is required';
+            
+            } elseif (User::findByUsername($username)) {
+                $errors['username'] = '✗ Username already taken';
+            }
+        
+            // Email Validation
+            if ($email === ''){
+                $errors['email'] ='✗ Email is required';
+            
+            } elseif (!validate_email($email)) {
+                $errors['email'] = '✗ Invalid email format';
+            
+            } elseif (User::findByEmail($email)) {
+                $errors['email'] = '✗ Email already registered';
+            }
+        
+            // Password Validation
+            if ($password === '')
+                $errors['password'] = '✗ Password is required';
+            elseif (!validate_password($password))
+                $errors['password'] = '✗ Password must be 8+ chars & include a number';
+        
+            if ($password !== $confirm)
+                $errors['confirm_password'] = '✗ Passwords do not match';
+        
+            // If errors exist, load the form and display errors
+            if (!empty($errors)) {
+                $errorData = $errors;
+                $_SESSION['errors'] = $errors;
+                $_SESSION['old'] = $_POST;
+                header('Location: register');
+                return;
+            }
 
-        } elseif (User::findByUsername($username)) {
-            $errors['username'] = '✗ Username already taken';
-        }
-
-        // Email Validation
-        if ($email === ''){
-            $errors['email'] ='✗ Email is required';
-
-        } elseif (!validate_email($email)) {
-            $errors['email'] = '✗ Invalid email format';
-
-        } elseif (User::findByEmail($email)) {
-            $errors['email'] = '✗ Email already registered';
-        }
-
-        // Password Validation
-        if ($password === '')
-            $errors['password'] = '✗ Password is required';
-        elseif (!validate_password($password))
-            $errors['password'] = '✗ Password must be 8+ chars & include a number';
-
-        if ($password !== $confirm)
-            $errors['confirm_password'] = '✗ Passwords do not match';
-
-        // If errors exist, load the form and display errors
-        if (!empty($errors)) {
-            $errorData = $errors;
+            // Insert user into db
+            User::create($username, $email, hash_password($password));
+            
+            // Redirect to login route
+            header('Location: /login');
+            exit;
+    
+        } catch (Exception $e) {
+            // Log the database error
+            Logger::error('User registration failed', $e->getMessage());
+            
+            // Show user-friendly error message
+            $errors['password'] = '🔌 Unable to complete registration. Please try again later.';
             $_SESSION['errors'] = $errors;
             $_SESSION['old'] = $_POST;
-            header('Location: register');
-            return;
+            
+            header('Location: /register');
+            exit;
         }
-
-        // Insert user into db
-        User::create($username, $email, hash_password($password));
-        
-        // Redirect to login route
-        header('Location: login');
-
-        exit;
     }
 }
 ?>
