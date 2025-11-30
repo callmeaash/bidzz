@@ -19,4 +19,18 @@ function verify_password($password, $hash) {
     return password_verify($password, $hash);
 }
 
+class Logger {
+    private static $logFile = __DIR__ . '/../logs/app.log';
+    public static function error($filename, $message, $errorDetail = '') {
+        $logDir = dirname(self::$logFile);
+        if(!is_dir($logDir)) {
+            mkdir($logDir, 0755, TRUE);
+        }
+        
+        $timestamp = date('Y-m-d H:i:s');
+        $logMessage = "[{$timestamp}] [$filename] ERROR: {$message} | {$errorDetail}" . PHP_EOL;
+
+        file_put_contents(self::$logFile, $logMessage, FILE_APPEND);
+    }
+}
 ?>
