@@ -54,7 +54,8 @@ class LoginController{
         }
 
         // Store the user data in session
-        $_SESSION['username'] = $username->username;
+        $_SESSION['username'] = $user->username;
+        $_SESSION['email'] = $user->email;
         $_SESSION['user_id'] = $user->id;
         $_SESSION['role'] = $user->is_admin ? 'admin' : 'user';
 
@@ -63,7 +64,7 @@ class LoginController{
             exit;
         
         } else {
-            header('Location: /');
+            header('Location: /index');
             exit;
         }
     }

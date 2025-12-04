@@ -23,6 +23,20 @@ switch($route){
         require_once __DIR__ . '/../includes/db.php';
         (new AjaxController())->checkUsername();
         break;
+
+    case '':
+    case '/':
+    case 'index':
+        require_once __DIR__ . '/../app/controllers/indexController.php';
+        (new IndexController())->handle();
+        break;
+
+    case 'listing':
+        require_once __DIR__ . '/../includes/auth.php';
+        requireLogin();
+        require_once __DIR__ . '/../app/controllers/listingController.php';
+        (new ListingController())->handle();
+        break;
     
     default:
         http_response_code(404);

@@ -4,7 +4,7 @@ CREATE TABLE users (
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    avatar VARCHAR(255) NOT NULL DEFAULT '/static/uploads/avatar.jpg',
+    avatar VARCHAR(255) NOT NULL DEFAULT '/images/uploads/avatar.jpg',
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -16,7 +16,7 @@ CREATE TABLE items (
     owner_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    image VARCHAR(255) NOT NULL DEFAULT '/static/uploads/item.jpg',
+    image VARCHAR(255) NOT NULL DEFAULT '/images/uploads/item.jpg',
     category VARCHAR(255) NOT NULL,
     starting_bid FLOAT NOT NULL,
     current_bid FLOAT,

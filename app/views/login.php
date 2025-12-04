@@ -23,7 +23,7 @@
         <form id="login-form" method="POST" action="/login">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="aashish" class="<?= isset($errors['username']) ? 'error': ''?>">
+                <input type="text" id="username" name="username" placeholder="aashish" autocomplete="off" class="<?= isset($errors['username']) ? 'error': ''?>">
                 <div id="username-validation" class="validation-message <?= isset($errors['username'])? 'error show': '' ?>">
                     <?= $errors['username'] ?? '' ?>
                 </div>
@@ -32,7 +32,7 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Enter your password" class="<?= isset($errors['passsword'])? 'error' : ''?>">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="off" class="<?= isset($errors['passsword'])? 'error' : ''?>">
                     <button type="button" class="toggle-password" onclick="togglePassword('password')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

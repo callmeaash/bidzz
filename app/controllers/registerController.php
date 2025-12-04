@@ -59,7 +59,7 @@ class RegisterController{
                 $errorData = $errors;
                 $_SESSION['errors'] = $errors;
                 $_SESSION['old'] = $_POST;
-                header('Location: register');
+                header('Location: /register');
                 return;
             }
 
@@ -72,7 +72,7 @@ class RegisterController{
     
         } catch (Exception $e) {
             // Log the database error
-            Logger::error('User registration failed', $e->getMessage());
+            Logger::error(basename(__FILE__), 'User registration failed', $e->getMessage());
             
             // Show user-friendly error message
             $errors['password'] = '🔌 Unable to complete registration. Please try again later.';

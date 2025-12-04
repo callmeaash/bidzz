@@ -5,14 +5,13 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 function requireLogin() {
-    return isset($_SESSION['user_id']);
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /login');
+        exit();
+    }
 }
 
 function requireAdmin() {
     return isset($_SESSION['user_id']) && !empty($_SESSION['is_admin']);
-}
-
-function requireUserOrAdmin() {
-    return isset($_SESSION['user_id']);
 }
 ?>

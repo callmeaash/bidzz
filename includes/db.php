@@ -1,10 +1,11 @@
 <?php
 
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
 
 require_once __DIR__ . '/utils.php';
 $dotenv = parse_ini_file(__DIR__ . '/../.env');
+
+global $mysqli;
+$mysqli = null;
 
 try{
     $mysqli = new mysqli(
@@ -23,6 +24,5 @@ try{
 
 } catch (Exception $e) {
     Logger::error(basename(__FILE__), "Database connection error", $e->getMessage());
-    $mysqli = null;
 }
 ?>

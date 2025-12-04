@@ -114,7 +114,7 @@ if (document.body.classList.contains('register-page')){
 // Handle form submission
 const SignupForm = document.getElementById('signup-form');
 if(SignupForm){
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
+    SignupForm.addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent default form submission
         
         const username = document.getElementById('username').value.trim();
@@ -167,7 +167,7 @@ if(SignupForm){
 // Handle form submission
 const loginForm = document.getElementById('login-form');
 if(loginForm){
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent default form submission
         
         const username = document.getElementById('username').value.trim();

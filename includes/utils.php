@@ -27,10 +27,14 @@ class Logger {
             mkdir($logDir, 0755, TRUE);
         }
         
+        date_default_timezone_set('Asia/Kathmandu');
         $timestamp = date('Y-m-d H:i:s');
         $logMessage = "[{$timestamp}] [$filename] ERROR: {$message} | {$errorDetail}" . PHP_EOL;
 
         file_put_contents(self::$logFile, $logMessage, FILE_APPEND);
     }
 }
+
+$itemsCategory = ['Electronics', 'Collectibles', 'Fashion', 'Sports', 'Art', 'Jewelry', 'Vehicles', 'Others'];
+
 ?>

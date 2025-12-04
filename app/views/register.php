@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/auth.css">
-    <title>Auction House - Create Account</title>
+    <title>Bidz - Create Account</title>
 </head>
 <body class="register-page">
     <div class="container">
@@ -28,6 +28,7 @@
                     id="username"
                     name="username"
                     placeholder="aashish"
+                    autocomplete="off"
                     value="<?= htmlspecialchars($old['username'] ?? '') ?>"
                     class="<?= isset($errors['username']) ? 'error' : '' ?>"
                 >
@@ -46,6 +47,7 @@
                     id="email"
                     name="email"
                     placeholder="aashish@example.com"
+                    autocomplete="off"
                     value="<?= htmlspecialchars($old['email'] ?? '') ?>""
                     class="<?= isset($errors['email']) ? 'error' : '' ?>"
                     oninput="checkEmail()"
@@ -68,6 +70,7 @@
                         placeholder="Create a password (min. 8 characters)"
                         value="<?= htmlspecialchars($old['email'] ?? '') ?>""
                         class="<?= isset($errors['password']) ? 'error' : '' ?>"
+                        autocomplete="off"
                         oninput="checkPassword()"
                     >
                     <button type="button" class="toggle-password" onclick="togglePassword('password')">
@@ -94,6 +97,7 @@
                         name="confirm_password"
                         placeholder="Confirm your password"
                         class="<?= isset($errors['confirm_password']) ? 'error' : '' ?>"
+                        autocomplete="off"
                         oninput="checkConfirmPassword()">
                     <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

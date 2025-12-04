@@ -26,8 +26,18 @@ class Item {
         $this->end_at = $row['end_at'];
     }
 
-    public static function findById($id) {
+    private static function getDb() {
         global $mysqli;
+        
+        if ($mysqli === null) {
+            throw new Exception("Database connection not available", 500);
+        }
+        
+        return $mysqli;
+    }
+
+    public static function findById($id) {
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM items WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -35,14 +45,14 @@ class Item {
         return $res ? new Item($res) : null;
     }
 
-    public static function getActiveItems($search = null) {
-        global $mysqli;
+    public static function getItems($search = null) {
+        $mysqli = self::getDb();
         if ($search) {
             $search = "%$search%";
-            $stmt = $mysqli->prepare("SELECT * FROM items WHERE is_active=1 AND (title LIKE ? OR description LIKE ?) ORDER BY end_at ASC");
+            $stmt = $mysqli->prepare("SELECT * FROM items WHERE title LIKE ? OR description LIKE ? ORDER BY end_at ASC");
             $stmt->bind_param("ss", $search, $search);
         } else {
-            $stmt = $mysqli->prepare("SELECT * FROM items WHERE is_active=1 ORDER BY end_at ASC");
+            $stmt = $mysqli->prepare("SELECT * FROM items ORDER BY end_at ASC");
         }
         $stmt->execute();
         $res = $stmt->get_result();
@@ -54,17 +64,17 @@ class Item {
     }
 
     public static function create($owner_id, $title, $description, $category, $starting_bid, $days, $image) {
-        global $mysqli;
+        $mysqli = self::getDb();
         $end_at = date('Y-m-d H:i:s', strtotime("+$days days"));
-        $stmt = $mysqli->prepare("INSERT INTO items (owner_id, title, description, category, starting_bid, current_bid, image, end_at) VALUES (?, ?, ?, ?, ?, NULL, ?, ?)");
-        $stmt->bind_param("isssdss", $owner_id, $title, $description, $category, $starting_bid, $image, $end_at);
+        $stmt = $mysqli->prepare("INSERT INTO items (owner_id, title, description, category, starting_bid, current_bid, image, end_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssddss", $owner_id, $title, $description, $category, $starting_bid, $starting_bid, $image, $end_at);
         $stmt->execute();
         return $mysqli->insert_id;
     }
 
     // Fetch all bids for this item with user info
     public function getBids() {
-        global $mysqli;
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("
             SELECT b.*, u.username, u.avatar
             FROM bids b
@@ -90,7 +100,7 @@ class Item {
 
     // Fetch all comments for this item with user info
     public function getComments() {
-        global $mysqli;
+        $mysqli = self::getDb();
         $stmt = $mysqli->prepare("
             SELECT c.*, u.username, u.avatar
             FROM comments c
@@ -112,6 +122,27 @@ class Item {
             ];
         }
         return $comments;
+    }
+
+    public function getBidsCount() {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare("
+            SELECT COUNT(*) as total_bids FROM bids
+            WHERE item_id = ?
+        ");
+        $stmt->bind_param('i', $this->id);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        return (int)$res['total_bids'];
+    }
+
+    public static function delete($item_id) {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare("
+            DELETE FROM items WHERE id = ?
+        ");
+        $stmt->bind_param('i', $item_id);
+        $stmt->execute();
     }
 }
 
