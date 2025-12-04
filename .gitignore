@@ -3,3 +3,4 @@
 api
 includes/models.php
 logs
+/public/images
