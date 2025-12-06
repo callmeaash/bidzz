@@ -9,17 +9,21 @@ body {
     background-color: #f5f5f5;
 }
 
-.header {
-    background-color: white;
+.navbar {
+    background-color: rgba(255, 255, 255, 1);
     padding: 15px 70px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
+    position: fixed;
+    width: 100%;
+    z-index: 10;
+    transition: background-color 0.3s ease;
 }
 
 @media (max-width: 768px) {
-    .header {
+    .navbar {
         padding: 15px 20px;
     }
 }
@@ -27,11 +31,10 @@ body {
 .logo-section {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .logo {
-    width: 50px;
-    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,7 +68,7 @@ body {
     }
 }
 
-.header-actions {
+.navbar-actions {
     display: flex;
     gap: 15px;
     align-items: center;
@@ -89,6 +92,11 @@ body {
     }
 }
 
+a{
+    text-decoration: none;
+    color: #333;
+}
+
 .user-icon {
     width: 40px;
     height: 40px;
@@ -101,14 +109,9 @@ body {
     position: relative;
 }
 
-a{
-    text-decoration: none;
-    color: #333;
-}
-
 .user-menu {
     position: absolute;
-    top: 70px;
+    top: 100%;
     right: 0px;
     background: white;
     border-radius: 8px;
@@ -175,12 +178,14 @@ a{
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 10px 10px;
+    padding: 10px;
+    padding-top: 90px;
 }
 
 @media (max-width: 768px) {
     .container {
         padding: 20px;
+        padding-top: 90px;
     }
 }
 
@@ -188,7 +193,7 @@ a{
     background: white;
     padding: 20px;
     border-radius: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: flex;
     gap: 15px;
     align-items: center;
@@ -331,47 +336,6 @@ a{
     background-color: #f0f0ff;
 }
 
-.tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 15px;
-    background: white;
-    padding: 6px;
-    border-radius: 10px;
-    width: fit-content;
-}
-
-.tab {
-    font-size: 15px;
-    color: #666;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border: none;
-    background: transparent;
-}
-
-.tab.active {
-    color: #1a1a1a;
-    font-weight: 600;
-    background: #f0f0f0;
-}
-
-@media (max-width: 768px) {
-    .tabs {
-        gap: 0;
-        width: 100%;
-    }
-    
-    .tab {
-        font-size: 14px;
-        flex: 1;
-        padding: 8px 16px;
-    }
-}
-
 .auction-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -392,6 +356,7 @@ a{
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
+
 
 .auction-card:hover {
     transform: translateY(-4px);
@@ -511,10 +476,9 @@ a{
 
 .auction-actions {
     display: flex;
-    gap: 12px;
 }
 
-.view-btn, .bid-btn {
+.view-btn {
     padding: 12px;
     border-radius: 10px;
     border: none;
@@ -525,27 +489,13 @@ a{
     align-items: center;
     justify-content: center;
     gap: 8px;
+    background: #2a2a2a;
+    color: white;
+    flex: 1;
     transition: all 0.2s;
 }
 
-.view-btn {
-    background: white;
-    border: 1px solid #e0e0e0;
-    color: #333;
-    flex: 0.8;
-}
-
 .view-btn:hover {
-    background: #f8f8f8;
-}
-
-.bid-btn {
-    background: #000;
-    color: white;
-    flex: 1.2;
-}
-
-.bid-btn:hover {
     background: #1a1a1a;
 }
 
@@ -586,13 +536,6 @@ a{
     font-size: 17px;
 }
 
-.favorite-btn.active .heart-icon {
+.favorite-btn.active i {
     color: red;
-}
-
-
-@media (max-width: 768px) {
-    .help-button {
-        display: flex;
-    }
 }

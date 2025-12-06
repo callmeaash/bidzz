@@ -8,41 +8,42 @@
     <title>Bidz</title>
 </head>
 <body>
-    <div class="header">
+    <div class="navbar">
         <div class="logo-section">
             <div class="logo"><img src="images/logo.png" alt="Logo"></div>
             <div class="logo-text">
                 <h1>Bidz</h1>
             </div>
         </div>
-        <div class="header-actions">
+        <div class="navbar-actions">
             <?php if (isset($_SESSION['username'])): ?>
                 <a href="/listing"><button class="start-selling-btn">Start Selling</button></a>
             <?php endif; ?>
-            <div class="user-icon" onclick="toggleUserMenu()"><i class="fa-regular fa-user"></i></div>
-        </div>
-    </div>
 
-    <div class="user-menu" id="userMenu">
-        <?php if (!isset($_SESSION['username'])): ?>
-            <a href="/login"><div class="user-menu-item">Login</div></a>
-            <a href="/register"><div class="user-menu-item">Register</div></a>
-
-        <?php else: ?>
-        <div class="user-menu-header">
-            <h3><?= $_SESSION['username'] ?></h3>
-            <p><?= $_SESSION['email'] ?></p>
-        </div>
-        <div class="user-menu-item">My Bids</div>
-        <div class="user-menu-item">My Listings</div>
-        <div class="user-menu-item">Settings</div>
-        <a href="/logout">
-            <div class="user-menu-item">
-                <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
-                Logout
+            <div class="user-icon" onclick="toggleUserMenu()">
+                <i class="fa-regular fa-user"></i>
+                <div class="user-menu" id="userMenu">
+                    <?php if (!isset($_SESSION['username'])): ?>
+                        <a href="/login"><div class="user-menu-item">Login</div></a>
+                        <a href="/register"><div class="user-menu-item">Register</div></a>
+                    <?php else: ?>
+                    <div class="user-menu-header">
+                        <h3><?= $_SESSION['username'] ?></h3>
+                        <p><?= $_SESSION['email'] ?></p>
+                    </div>
+                    <div class="user-menu-item">My Bids</div>
+                    <div class="user-menu-item">My Listings</div>
+                    <div class="user-menu-item">Settings</div>
+                    <a href="/logout">
+                        <div class="user-menu-item">
+                            <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
+                            Logout
+                        </div>
+                    </a>
+                    <?php endif; ?>
+                </div>
             </div>
-        </a>
-        <?php endif; ?>
+        </div>
     </div>
 
     <div class="container">
@@ -86,18 +87,13 @@
             </div>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('active')">Active Auctions (<span id="activeCount">6</span>)</div>
-            <div class="tab" onclick="switchTab('ended')">Ended Auctions (<span id="endedCount">3</span>)</div>
-        </div>
-
         <div class="auction-grid" id="activeAuctions">
             <?php foreach($items as $item): ?>
             <div class="auction-card">
                 <div class="image-container">
                     <img src="<?= $item->image ?>" alt="<?= $item->title ?>" class="auction-image">
-                    <button class="favorite-btn" onclick="toggleFavorite(event, this)">
-                        <i class="fa-regular fa-heart heart-icon" id="heart-icon"></i>
+                    <button class="favorite-btn">
+                        <i class="fa-regular fa-heart heart-icon"></i>
                     </button>
                     <span class="category-badge"><?= $item->category ?></span>
                 </div>
@@ -116,8 +112,8 @@
                             <span class="info-label">Ends in</span>
                             <div class="info-time">
                                 <i class="fa-regular fa-clock clock-icon"></i>
-                                <span class="info-value">
-                                    1h 36m 34s
+                                <span class="info-value" data-end="<?= $item->end_at ?>">
+                                    loading...
                                 </span>
                             </div>
                         </div>
@@ -127,10 +123,6 @@
                             <i class="fa-solid fa-eye eye-icon"></i>
                             <span>View</span>
                         </button>
-                        <button class="bid-btn">
-                            <i class="fa-solid fa-gavel gavel-icon"></i>
-                            <span>Bid</span>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -139,11 +131,22 @@
     </div>
 
     <script>
+
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.navbar');
+            const scrollY = window.scrollY;
+            const maxScroll = 300;
+            let opacity = 1 - (scrollY / maxScroll) * 0.3;
+            if (opacity < 0.9) opacity = 0.9;
+
+            header.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
+        });
+
         function toggleFavorite(event, button) {
             event.stopPropagation();
             const isActive = button.classList.toggle('active');
 
-            const heart = document.getElementById('heart-icon');
+            const heart = button.querySelector('i');
 
             if (isActive) {
                 heart.classList.remove('fa-regular');
@@ -154,23 +157,11 @@
             }
         }
 
-        function switchTab(tab) {
-            const tabs = document.querySelectorAll('.tab');
-            const activeAuctions = document.getElementById('activeAuctions');
-            const endedAuctions = document.getElementById('endedAuctions');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'active') {
-                tabs[0].classList.add('active');
-                activeAuctions.style.display = 'grid';
-                endedAuctions.style.display = 'none';
-            } else {
-                tabs[1].classList.add('active');
-                activeAuctions.style.display = 'none';
-                endedAuctions.style.display = 'grid';
-            }
-        }
+        document.querySelectorAll('.favorite-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                toggleFavorite(event, button);
+            });
+        });
 
         function toggleUserMenu() {
             const menu = document.getElementById('userMenu');
@@ -231,27 +222,24 @@
         // Update countdown timers
         setInterval(() => {
             document.querySelectorAll('.info-value').forEach(timer => {
-                const text = timer.textContent;
-                if (text.includes('h') && text.includes('m')) {
-                    const parts = text.match(/(\d+)h (\d+)m (\d+)s/);
-                    if (parts) {
-                        let hours = parseInt(parts[1]);
-                        let minutes = parseInt(parts[2]);
-                        let seconds = parseInt(parts[3]);
-                        
-                        seconds--;
-                        if (seconds < 0) {
-                            seconds = 59;
-                            minutes--;
-                            if (minutes < 0) {
-                                minutes = 59;
-                                hours--;
-                            }
-                        }
-                        
-                        timer.textContent = `${hours}h ${minutes}m ${seconds}s`;
-                    }
+        
+                const text = timer.dataset.end;
+                const endAt = new Date(text.replace(' ', 'T'));
+                const now = new Date();
+
+                const diff = endAt - now;
+
+                if (diff <= 0) {
+                    timer.textContent = "Expired";
+                    return;
                 }
+
+                const seconds = Math.floor((diff / 1000) % 60);
+                const minutes = Math.floor((diff / 1000 / 60) % 60);
+                const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
+                const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+
+                timer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
             });
         }, 1000);
     </script>
