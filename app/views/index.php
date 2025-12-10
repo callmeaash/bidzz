@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
     <title>Bidz</title>
 </head>
@@ -33,7 +34,7 @@
                     </div>
                     <div class="user-menu-item">My Bids</div>
                     <div class="user-menu-item">My Listings</div>
-                    <div class="user-menu-item">Settings</div>
+                    <div class="user-menu-item">Watchlists</div>
                     <a href="/logout">
                         <div class="user-menu-item">
                             <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
@@ -50,7 +51,7 @@
         <div class="search-filter-section">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" placeholder="Search auctions...">
+                <input type="text" placeholder="Search auctions..." id="searchInput">
             </div>
             <div class="filter-dropdown">
                 <div class="filter-btn" onclick="toggleDropdown('category')">
@@ -60,14 +61,10 @@
                 <div class="dropdown-menu" id="categoryDropdown">
                     <div class="dropdown-item selected" onclick="selectCategory('All Categories')">
                         <span>All Categories</span>
-                        <span><i class="fa-solid fa-check"></i></span>
                     </div>
-                    <div class="dropdown-item" onclick="selectCategory('Watches')">Watches</div>
-                    <div class="dropdown-item" onclick="selectCategory('Photography')">Photography</div>
-                    <div class="dropdown-item" onclick="selectCategory('Art')">Art</div>
-                    <div class="dropdown-item" onclick="selectCategory('Vehicles')">Vehicles</div>
-                    <div class="dropdown-item" onclick="selectCategory('Furniture')">Furniture</div>
-                    <div class="dropdown-item" onclick="selectCategory('Jewelry')">Jewelry</div>
+                    <?php foreach ($uniqueCategories as $category): ?>
+                    <div class="dropdown-item" onclick="selectCategory('<?= $category ?>')"><?= $category ?></div>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <div class="filter-dropdown">
@@ -78,10 +75,8 @@
                 <div class="dropdown-menu" id="sortDropdown">
                     <div class="dropdown-item selected" onclick="selectSort('Ending Soon')">
                         <span>Ending Soon</span>
-                        <span><i class="fa-solid fa-check"></i></span>
                     </div>
                     <div class="dropdown-item" onclick="selectSort('Highest Bid')">Highest Bid</div>
-                    <div class="dropdown-item" onclick="selectSort('Most Bids')">Most Bids</div>
                     <div class="dropdown-item" onclick="selectSort('Newest')">Newest</div>
                 </div>
             </div>
@@ -89,12 +84,21 @@
 
         <div class="auction-grid" id="activeAuctions">
             <?php foreach($items as $item): ?>
-            <div class="auction-card">
+            <div class="auction-card"
+                data-category="<?= $item->category ?>"
+                data-title="<?= $item->title ?>"
+                data-end="<?= $item->end_at ?>"
+                data-start="<?= $item->created_at ?>"
+                data-currentbid="<?= $item->current_bid ?>"
+            >
                 <div class="image-container">
                     <img src="<?= $item->image ?>" alt="<?= $item->title ?>" class="auction-image">
-                    <button class="favorite-btn">
-                        <i class="fa-regular fa-heart heart-icon"></i>
-                    </button>
+                    
+                    <?php if (isset($_SESSION['username'])): ?>
+                        <button class="favorite-btn <?= $item->is_favorited ? 'active':'' ?>" data-item="<?= $item->id ?>" data-isfavorited="<?= $item->is_favorited ?>">
+                            <i class="<?= $item->is_favorited ? 'fa-solid':'fa-regular' ?> fa-heart heart-icon "></i>
+                        </button>
+                    <?php endif; ?>
                     <span class="category-badge"><?= $item->category ?></span>
                 </div>
                 <div class="auction-content">
@@ -130,118 +134,6 @@
         </div>
     </div>
 
-    <script>
-
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.navbar');
-            const scrollY = window.scrollY;
-            const maxScroll = 300;
-            let opacity = 1 - (scrollY / maxScroll) * 0.3;
-            if (opacity < 0.9) opacity = 0.9;
-
-            header.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
-        });
-
-        function toggleFavorite(event, button) {
-            event.stopPropagation();
-            const isActive = button.classList.toggle('active');
-
-            const heart = button.querySelector('i');
-
-            if (isActive) {
-                heart.classList.remove('fa-regular');
-                heart.classList.add('fa-solid');
-            } else {
-                heart.classList.remove('fa-solid');
-                heart.classList.add('fa-regular');
-            }
-        }
-
-        document.querySelectorAll('.favorite-btn').forEach(button => {
-            button.addEventListener('click', (event) => {
-                toggleFavorite(event, button);
-            });
-        });
-
-        function toggleUserMenu() {
-            const menu = document.getElementById('userMenu');
-            menu.classList.toggle('active');
-        }
-
-        function toggleDropdown(type) {
-            const dropdown = document.getElementById(type + 'Dropdown');
-            dropdown.classList.toggle('active');
-            
-            // Close other dropdown
-            const otherType = type === 'category' ? 'sort' : 'category';
-            document.getElementById(otherType + 'Dropdown').classList.remove('active');
-        }
-
-        function selectCategory(category) {
-            document.getElementById('categoryLabel').textContent = category;
-            
-            // Update selected state
-            const items = document.querySelectorAll('#categoryDropdown .dropdown-item');
-            items.forEach(item => {
-                item.classList.remove('selected');
-                if (item.textContent.includes(category)) {
-                    item.classList.add('selected');
-                }
-            });
-            
-            document.getElementById('categoryDropdown').classList.remove('active');
-        }
-
-        function selectSort(sort) {
-            document.getElementById('sortLabel').textContent = sort;
-            
-            // Update selected state
-            const items = document.querySelectorAll('#sortDropdown .dropdown-item');
-            items.forEach(item => {
-                item.classList.remove('selected');
-                if (item.textContent.includes(sort)) {
-                    item.classList.add('selected');
-                }
-            });
-            
-            document.getElementById('sortDropdown').classList.remove('active');
-        }
-
-        // Close dropdowns and menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.filter-dropdown')) {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    menu.classList.remove('active');
-                });
-            }
-            if (!event.target.closest('.user-icon') && !event.target.closest('.user-menu')) {
-                document.getElementById('userMenu').classList.remove('active');
-            }
-        });
-
-        // Update countdown timers
-        setInterval(() => {
-            document.querySelectorAll('.info-value').forEach(timer => {
-        
-                const text = timer.dataset.end;
-                const endAt = new Date(text.replace(' ', 'T'));
-                const now = new Date();
-
-                const diff = endAt - now;
-
-                if (diff <= 0) {
-                    timer.textContent = "Expired";
-                    return;
-                }
-
-                const seconds = Math.floor((diff / 1000) % 60);
-                const minutes = Math.floor((diff / 1000 / 60) % 60);
-                const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
-                const days = Math.floor(diff / 1000 / 60 / 60 / 24);
-
-                timer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            });
-        }, 1000);
-    </script>
+    <script src="/js/index.js"></script>
 </body>
 </html>

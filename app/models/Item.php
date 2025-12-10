@@ -12,6 +12,8 @@ class Item {
     public $current_bid;
     public $is_active;
     public $end_at;
+    public $created_at;
+    public $is_favorited;
 
     public function __construct($row) {
         $this->id = $row['id'];
@@ -24,6 +26,8 @@ class Item {
         $this->current_bid = $row['current_bid'];
         $this->is_active = $row['is_active'];
         $this->end_at = $row['end_at'];
+        $this->created_at = $row['created_at'];
+        $this->is_favorited = $row['is_favorited'] ?? '';
     }
 
     private static function getDb() {
@@ -54,6 +58,33 @@ class Item {
         } else {
             $stmt = $mysqli->prepare("SELECT * FROM items ORDER BY end_at ASC");
         }
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            $items[] = new Item($row);
+        }
+        return $items;
+    }
+
+    public static function getItemsWithFavouriteStatus($userId) {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare("
+            SELECT 
+                items.*,
+                CASE 
+                    WHEN wishlists.item_id IS NOT NULL THEN 1
+                    ELSE 0
+                    END AS is_favorited
+            FROM items
+            LEFT JOIN wishlists 
+            ON wishlists.item_id = items.id 
+            AND wishlists.user_id = ?
+        ");
+        if (!$stmt) {
+        die("Prepare failed: " . $mysqli->error);
+    }
+        $stmt->bind_param("i", $userId);
         $stmt->execute();
         $res = $stmt->get_result();
         $items = [];

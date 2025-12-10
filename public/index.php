@@ -25,7 +25,6 @@ switch($route){
         break;
 
     case '':
-    case '/':
     case 'index':
         require_once __DIR__ . '/../app/controllers/indexController.php';
         (new IndexController())->handle();
@@ -38,6 +37,17 @@ switch($route){
         (new ListingController())->handle();
         break;
     
+    
+    case 'favorites/toggle':
+        require_once __DIR__ . '/../app/controllers/favoritesController.php';
+        (new FavoritesController())->handle();
+        break;
+
+    case 'logout':
+        require_once __DIR__ . '/../app/controllers/logoutController.php';
+        (new LogoutController())->handle();
+        break;
+
     default:
         http_response_code(404);
         echo "404 - Page not found";

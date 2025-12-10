@@ -94,7 +94,7 @@ input:focus, textarea:focus, select:focus {
     background: white;
 }
 
-input[type="text"].error, input[type="file"].error, textarea.error, select.error {
+input[type="text"].error, input[type="file"].error, textarea.error, select.error, #imageUploadArea.error {
     border-color: #ef4444;
 }
 

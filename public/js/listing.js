@@ -10,6 +10,27 @@ function updateSummary() {
     document.getElementById('summary-bid').textContent = '$' + (parseFloat(startingBid) || 0).toFixed(2);
 }
 
+function showError(fieldId, message) {
+    const validationDiv = document.getElementById(fieldId + '-validation');
+    if (fieldId === 'image') fieldId = 'imageUploadArea';
+    const input = document.getElementById(fieldId);
+                
+    validationDiv.textContent = message;
+    validationDiv.className = 'validation-message error';
+    input.classList.add('error');
+}
+
+function clearValidation(fieldId) {
+    const validationDiv = document.getElementById(fieldId + '-validation');
+    if (fieldId === 'image') fieldId = 'imageUploadArea';
+    const input = document.getElementById(fieldId);
+
+    validationDiv.textContent = '';
+    validationDiv.className = 'validation-message';
+    input.classList.remove('error');
+    
+}
+
 function handleImageUpload(event) {
     const file = event.target.files[0];
     if(!file) return;
@@ -23,7 +44,7 @@ function handleImageUpload(event) {
         return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > maxSize) {
         showError('image', 'Image must be under 10MB')
         return;
     }
@@ -46,24 +67,6 @@ function displayImage(file) {
     };
 
     reader.readAsDataURL(file);
-}
-
-function showError(fieldId, message) {
-    const validationDiv = document.getElementById(fieldId + '-validation');
-    const input = document.getElementById(fieldId);
-                
-    validationDiv.textContent = message;
-    validationDiv.className = 'validation-message error';
-    input.classList.add('error');
-}
-
-function clearValidation(fieldId) {
-    const validationDiv = document.getElementById(fieldId + '-validation');
-    const input = document.getElementById(fieldId);
-
-    validationDiv.textContent = '';
-    validationDiv.className = 'validation-message';
-    input.classList.remove('error');
 }
 
 function removeImage() {
@@ -91,7 +94,7 @@ document.getElementById('listing-form').addEventListener('submit', function(e) {
         clearValidation('title');
     }
 
-    if (description.length < 100) {
+    if (description.length < 20) {
         showError('description', '✗ Description must be at least 20 characters');
         isValid = false;
     } else {

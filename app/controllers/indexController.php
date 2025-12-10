@@ -5,7 +5,13 @@ class IndexController {
         if ($_SERVER['REQUEST_METHOD'] == 'GET'){
             require_once __DIR__ . '/../models/Item.php';
             try{
-                $items = Item::getItems();
+
+                if (isset($_SESSION['user_id'])) {
+                    $items = Item::getItemsWithFavouriteStatus($_SESSION['user_id']);
+                } else{
+                    $items = Item::getItems();
+                }
+                $uniqueCategories = array_unique(array_map(fn($item) => $item->category, $items));
             
             } catch (Exception $e) {
                 require_once __DIR__ . '/../../includes/utils.php';
