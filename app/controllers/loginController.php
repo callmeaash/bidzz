@@ -43,7 +43,7 @@ class LoginController{
         } catch (Exception $e){
             require_once __DIR__ . '/../../includes/utils.php';
             Logger::error(basename(__FILE__), "Database connection Error", $e->getMessage());
-            $errors['password'] = '🔄 Something went wrong. Please try again.';
+            $errors['password'] = 'Something went wrong. Please try again.';
         }
 
         if (!empty($errors)){
@@ -64,7 +64,7 @@ class LoginController{
             exit;
         
         } else {
-            header('Location: /index');
+            header('Location: /');
             exit;
         }
     }

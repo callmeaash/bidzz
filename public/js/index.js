@@ -189,3 +189,12 @@ document.querySelectorAll('.favorite-btn').forEach(button => {
         })
     })
 });
+
+document.getElementById('userIcon').addEventListener('click', toggleUserMenu);
+
+document.querySelectorAll('.auction-card').forEach((item) => {
+    item.addEventListener('click', function() {
+        const id = this.dataset.item_id;
+        window.location = `/items/${id}`;
+    });
+});

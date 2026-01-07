@@ -10,8 +10,3 @@ function requireLogin() {
         exit();
     }
 }
-
-function requireAdmin() {
-    return isset($_SESSION['user_id']) && !empty($_SESSION['is_admin']);
-}
-?>

@@ -5,17 +5,30 @@ class User {
     public $id;
     public $username;
     public $password;
+    public $fullname;
     public $email;
     public $avatar;
+    public $country;
+    public $phone;
+    public $bio;
     public $is_admin;
+    public $is_active;
+    public $created_at;
+    public $updated_at;
 
-    public function __construct($row) {
-        $this->id = $row['id'];
-        $this->username = $row['username'];
-        $this->password = $row['password'];
-        $this->email = $row['email'];
-        $this->avatar = $row['avatar'];
-        $this->is_admin = $row['is_admin'];
+    public function __construct(array $row) {
+        $this->id         = $row['id'] ?? null;
+        $this->username   = $row['username'] ?? null;
+        $this->password   = $row['password'] ?? null;
+        $this->email      = $row['email'] ?? null;
+        $this->avatar     = $row['avatar'] ?? null;
+        $this->country    = $row['country'] ?? null;
+        $this->phone      = $row['phone'] ?? null;
+        $this->bio        = $row['bio'] ?? null;
+        $this->is_admin   = (bool) ($row['is_admin'] ?? false);
+        $this->is_active  = (bool) ($row['is_active'] ?? true);
+        $this->created_at = $row['created_at'] ?? null;
+        $this->updated_at = $row['updated_at'] ?? null;
     }
 
     private static function getDb() {
@@ -61,6 +74,23 @@ class User {
         $stmt->bind_param("sss", $username, $password, $email);
         $stmt->execute();
         return $mysqli->insert_id;
+    }
+
+    public static function updateProfile(int $userId, array $data) {
+        $mysqli = self::getDb();
+
+        $sql = "UPDATE users SET avatar = ?, fullname = ?, country = ?, phone = ?, bio = ? WHERE id = ?";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param(
+            "sssssi",
+            $data['avatar'],
+            $data['fullName'],
+            $data['country'],
+            $data['phone'],
+            $data['bio'],
+            $userId
+        );
+        return $stmt->execute();
     }
 }
 

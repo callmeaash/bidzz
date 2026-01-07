@@ -21,25 +21,29 @@
                 <a href="/listing"><button class="start-selling-btn">Start Selling</button></a>
             <?php endif; ?>
 
-            <div class="user-icon" onclick="toggleUserMenu()">
-                <i class="fa-regular fa-user"></i>
+            <div class="user-icon" id="userIcon">
+                <?php if (isset($_SESSION['user_id']) && $user->avatar): ?>
+                    <img src="<?= $user->avatar ?>">
+                <?php else: ?>
+                    <i class="fa-regular fa-user"></i>
+                <?php endif; ?>
+
                 <div class="user-menu" id="userMenu">
                     <?php if (!isset($_SESSION['username'])): ?>
-                        <a href="/login"><div class="user-menu-item">Login</div></a>
-                        <a href="/register"><div class="user-menu-item">Register</div></a>
+                        <a href="/login" class="user-menu-item">Login</a>
+                        <a href="/register" class="user-menu-item">Register</a>
                     <?php else: ?>
                     <div class="user-menu-header">
                         <h3><?= $_SESSION['username'] ?></h3>
                         <p><?= $_SESSION['email'] ?></p>
                     </div>
-                    <div class="user-menu-item">My Bids</div>
-                    <div class="user-menu-item">My Listings</div>
-                    <div class="user-menu-item">Watchlists</div>
-                    <a href="/logout">
-                        <div class="user-menu-item">
-                            <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
-                            Logout
-                        </div>
+                    <a href="/my-bids" class="user-menu-item">My Bids</a>
+                    <a href="/my-listing" class="user-menu-item">My Listings</a>
+                    <a href="/watchlist" class="user-menu-item">Watchlists</a>
+                    <a href="/me" class="user-menu-item">Settings</a>
+                    <a href="/logout" class="user-menu-item">
+                        <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>
+                        Logout
                     </a>
                     <?php endif; ?>
                 </div>
@@ -90,6 +94,7 @@
                 data-end="<?= $item->end_at ?>"
                 data-start="<?= $item->created_at ?>"
                 data-currentbid="<?= $item->current_bid ?>"
+                data-item_id="<?= $item->id ?>"
             >
                 <div class="image-container">
                     <img src="<?= $item->image ?>" alt="<?= $item->title ?>" class="auction-image">
@@ -108,7 +113,7 @@
                         <div class="info-item">
                             <span class="info-label">Current bid</span>
                             <div>
-                                <span class="current-bid">$<?= $item->current_bid ?></span>
+                                <span class="current-bid">$<?= number_format($item->current_bid) ?></span>
                                 <span class="bid-count">(<?= $item->getBidsCount() ?>)</span>
                             </div>
                         </div>
@@ -123,10 +128,10 @@
                         </div>
                     </div>
                     <div class="auction-actions">
-                        <button class="view-btn">
+                        <a href="/items/<?=$item->id?>" class="view-btn">
                             <i class="fa-solid fa-eye eye-icon"></i>
                             <span>View</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

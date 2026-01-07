@@ -4,9 +4,10 @@ class IndexController {
     public function handle() {
         if ($_SERVER['REQUEST_METHOD'] == 'GET'){
             require_once __DIR__ . '/../models/Item.php';
+            require_once __DIR__ . '/../models/User.php';
             try{
-
                 if (isset($_SESSION['user_id'])) {
+                    $user = User::findById($_SESSION['user_id']);
                     $items = Item::getItemsWithFavouriteStatus($_SESSION['user_id']);
                 } else{
                     $items = Item::getItems();

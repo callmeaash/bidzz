@@ -36,7 +36,7 @@ function handleImageUpload(event) {
     if(!file) return;
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
 
     if (!allowedTypes.includes(file.type)) {
         showError('image', '✗ Only JPG or PNG files are allowed');
@@ -45,7 +45,8 @@ function handleImageUpload(event) {
     }
 
     if (file.size > maxSize) {
-        showError('image', 'Image must be under 10MB')
+        showError('image', 'Image must be under 10MB');
+        event.target.value = '';
         return;
     }
 

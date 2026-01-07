@@ -2,10 +2,14 @@
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
+    fullname VARCHAR(255),
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     avatar VARCHAR(255) NOT NULL DEFAULT '/images/uploads/avatar.jpg',
+    country VARCHAR(255),
+    bio TEXT,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -54,6 +58,7 @@ CREATE TABLE comments (
 CREATE TABLE wishlists (
     user_id INT NOT NULL,
     item_id INT NOT NULL,
+    
     PRIMARY KEY(user_id, item_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
@@ -64,6 +69,8 @@ CREATE TABLE reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reporter_id INT NOT NULL,
     target_id INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    message TEXT,
     status ENUM('pending','resolved') NOT NULL DEFAULT 'pending',
     FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (target_id) REFERENCES items(id) ON DELETE CASCADE

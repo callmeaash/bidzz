@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Dialog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .dialog-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #374151;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .warning-icon {
+            color: #dc2626;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .dialog-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .dialog-content {
+            padding: 24px;
+        }
+
+        .reporting-item {
+            margin-bottom: 24px;
+        }
+
+        .reporting-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .reporting-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-top: 2px;
+            margin-right: 12px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .radio-label {
+            flex: 1;
+        }
+
+        .radio-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .radio-description {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .textarea-field {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .textarea-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-note {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 12px;
+        }
+
+        .dialog-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .dialog-btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .dialog-btn-cancel {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .dialog-btn-cancel:hover {
+            background-color: #f9fafb;
+        }
+
+        .dialog-btn-submit {
+            background-color: #000000;
+            color: white;
+        }
+
+        .dialog-btn-submit:hover {
+            background-color: #1f2937;
+        }
+
+        .dialog-btn-submit:disabled {
+            background-color: #6b7280;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .dialog-btn-submit:disabled:hover {
+            background-color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-overlay" id="reportDialog">
+        <div class="dialog-box" onclick="event.stopPropagation()">
+            <div class="dialog-header">
+                <button class="close-btn">&times;</button>
+                <div class="header-icon">
+                    <span class="warning-icon">⚠</span>
+                </div>
+                <h2 class="dialog-title">Report This Listing</h2>
+                <p class="dialog-subtitle">Help us keep the marketplace safe</p>
+            </div>
+
+            <div class="dialog-content">
+                <div class="reporting-item">
+                    <div class="reporting-label">Reporting:</div>
+                    <div class="reporting-value">Leica M3 Vintage Film Camera</div>
+                </div>
+
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label class="form-label">Reason for Report <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="counterfeit" required>
+                                <div class="radio-label">
+                                    <div class="radio-title">Counterfeit or Fake Item</div>
+                                    <div class="radio-description">This item appears to be counterfeit or fake</div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="misleading">
+                                <div class="radio-label">
+                                    <div class="radio-title">Misleading Description</div>
+                                    <div class="radio-description">The description does not match the item or is deceptive</div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="inappropriate">
+                                <div class="radio-label">
+                                    <div class="radio-title">Inappropriate Content</div>
+                                    <div class="radio-description">Contains offensive or inappropriate content</div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="stolen">
+                                <div class="radio-label">
+                                    <div class="radio-title">Stolen Property</div>
+                                    <div class="radio-description">This item may be stolen</div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="spam">
+                                <div class="radio-label">
+                                    <div class="radio-title">Spam or Scam</div>
+                                    <div class="radio-description">This listing appears to be spam or a scam</div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="reason" value="other">
+                                <div class="radio-label">
+                                    <div class="radio-title">Other</div>
+                                    <div class="radio-description">Other reason not listed above</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Additional Details (Optional)</label>
+                        <textarea 
+                            class="textarea-field" 
+                            name="details"
+                            placeholder="Provide any additional information that might help us review this report..."
+                        ></textarea>
+                        <p class="form-note">Your report will be reviewed by our team. False reports may result in account restrictions.</p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dialog-footer">
+                <button class="dialog-btn dialog-btn-cancel">Cancel</button>
+                <button class="dialog-btn dialog-btn-submit" id="submitBtn" disabled>Submit Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Report dialog functionality
+        const reportBtn = document.querySelector('.report-btn');
+        const reportDialog = document.getElementById('reportDialog');
+        const closeDialogBtn = document.querySelector('.close-btn');
+        const cancelBtn = document.querySelector('.dialog-btn-cancel');
+        const submitBtn = document.getElementById('submitBtn');
+        const radioButtons = document.querySelectorAll('input[name="reason"]');
+
+        // Show dialog when report button is clicked
+        if (reportBtn) {
+            reportBtn.addEventListener('click', () => {
+                reportDialog.style.display = 'flex';
+            });
+        }
+
+        // Close dialog function
+        function closeDialog() {
+            reportDialog.style.display = 'none';
+            // Reset form
+            document.getElementById('reportForm').reset();
+            submitBtn.disabled = true;
+        }
+
+        // Close dialog when X button is clicked
+        if (closeDialogBtn) {
+            closeDialogBtn.addEventListener('click', closeDialog);
+        }
+
+        // Close dialog when Cancel button is clicked
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeDialog);
+        }
+
+        // Close dialog when clicking outside the dialog box
+        reportDialog.addEventListener('click', (e) => {
+            if (e.target === reportDialog) {
+                closeDialog();
+            }
+        });
+
+        // Enable submit button when any radio is selected
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Submit report
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function() {
+                const form = document.getElementById('reportForm');
+                if (form.checkValidity()) {
+                    const formData = new FormData(form);
+                    const reason = formData.get('reason');
+                    const details = formData.get('details');
+                    
+                    console.log('Report submitted:', { reason, details });
+                    
+                    // In your actual implementation, send data to server
+                    // Example:
+                    // fetch('/items/<?= $item->id ?>/report', {
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' },
+                    //     body: JSON.stringify({ reason, details })
+                    // })
+                    // .then(res => res.json())
+                    // .then(data => {
+                    //     alert('Report submitted successfully!');
+                    //     closeDialog();
+                    // });
+                    
+                    alert('Report submitted successfully!');
+                    closeDialog();
+                } else {
+                    alert('Please select a reason for the report');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
