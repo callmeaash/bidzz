@@ -106,7 +106,60 @@ switch($segments[0]){
         require_once __DIR__ . '/../app/controllers/userController.php';
         (new UserController())->handle();
         break;
-        
+    
+    
+    case 'notifications':
+        $action = $segments[1] ?? null;
+        $notifID = $segments[2] ?? null;
+        require_once __DIR__ . '/../includes/auth.php';
+        requireLogin();
+        require_once __DIR__ . '/../app/controllers/notificationController.php';
+
+        if ($action == 'get-notifications') {
+            (new NotificationController())->getNotifications();
+        }
+        elseif ($action == 'mark-read') {
+            (new NotificationController())->markRead($notifID);
+        }
+        elseif ($action == 'delete') {
+            (new NotificationController())->deleteNotification($notifID);
+        }
+        elseif ($action == 'delete-all') {
+            (new NotificationController())->deleteAll();
+        }
+        elseif ($action == 'read-all') {
+            (new NotificationController())->readAll();
+        }
+        break;
+    
+    case 'admin':
+        require_once __DIR__ . '/../includes/auth.php';
+        require_once __DIR__ . '/../app/controllers/adminController.php';
+        $action = $segments[1] ?? null;
+        $Id = $segments[2] ?? null;
+
+        if ($action == 'toggle-user-status') {
+            requireAdminLogin();
+            (new AdminController())->toggleUserStatus();
+        }
+        elseif ($action == 'delete-user') {
+            requireAdminLogin();
+            (new AdminController())->deleteUser($Id);
+        }
+        elseif ($action == 'delete-item') {
+            requireAdminLogin();
+            (new AdminController())->deleteItem($Id);
+        }
+        elseif ($action == 'resolve-report') {
+            requireAdminLogin();
+            (new AdminController())->updateReportStatus();
+        }
+        else {
+            requireAdminLogin();
+            (new AdminController())->handle();
+        }
+        break;
+
     default:
         http_response_code(404);
         echo "404 - Page not found";

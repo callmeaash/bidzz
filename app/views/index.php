@@ -7,6 +7,271 @@
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
     <title>Bidz</title>
+
+    <style>
+        /* Notification Styles */
+        .notification-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-icon:hover {
+            background-color: #e5e5e5;
+        }
+
+        .notification-icon i {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .notification-panel {
+            position: absolute;
+            top: 100%;
+            right: 50px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 400px;
+            max-height: 600px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .notification-panel.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {          
+            .notification-panel {
+                right: -40px;
+                width: calc(100vw - 50px);
+                max-width: 400px;
+            }
+        }
+
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .notification-action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+        }
+
+        .notification-action-btn:hover {
+            color: #000;
+        }
+
+        .notification-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f8f8;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background-color: #3b82f6;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .notification-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-icon-wrapper.bid {
+            background-color: #d1fae5;
+        }
+
+        .notification-icon-wrapper.comment {
+            background-color: #dbeafe;
+        }
+
+        .notification-icon-wrapper.outbid {
+            background-color: #fee2e2;
+        }
+
+        .notification-icon-wrapper.ending {
+            background-color: #fef3c7;
+        }
+
+        .notification-icon-wrapper i {
+            font-size: 16px;
+        }
+
+        .notification-icon-wrapper.bid i {
+            color: #059669;
+        }
+
+        .notification-icon-wrapper.comment i {
+            color: #3b82f6;
+        }
+
+        .notification-icon-wrapper.outbid i {
+            color: #dc2626;
+        }
+
+        .notification-icon-wrapper.ending i {
+            color: #f59e0b;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .notification-item-name {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .unread-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .notification-close:hover {
+            color: #333;
+        }
+
+        .notification-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .notification-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .notification-empty p {
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
@@ -19,6 +284,32 @@
         <div class="navbar-actions">
             <?php if (isset($_SESSION['username'])): ?>
                 <a href="/listing"><button class="start-selling-btn">Start Selling</button></a>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="notification-icon" id="notificationIcon">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">2</span>
+                
+                <!-- Notification Panel -->
+                <div class="notification-panel" id="notificationPanel">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        <div class="notification-actions">
+                            <button class="notification-action-btn" id="markAllRead">
+                                <i class="fa-solid fa-check"></i>
+                                Mark all read
+                            </button>
+                            <button class="notification-action-btn" id="clearAll">
+                                Clear all
+                            </button>
+                        </div>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
 
             <div class="user-icon" id="userIcon">

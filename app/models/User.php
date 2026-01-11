@@ -41,6 +41,18 @@ class User {
         return $mysqli;
     }
 
+    public static function findAll() {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare("SELECT * FROM users;");
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $users = [];
+        while ($row = $res->fetch_assoc()) {
+            $users[] = new User($row);
+        }
+        return $users;
+    }
+
     public static function findByEmail($email) {
         $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM users WHERE email = ?");
@@ -92,6 +104,50 @@ class User {
         );
         return $stmt->execute();
     }
-}
 
+        public function getTotalBids() {
+        $mysqli = self::getDb();
+
+        $stmt = $mysqli->prepare(
+            "SELECT COUNT(*) AS total FROM bids WHERE user_id = ?"
+        );
+        $stmt->bind_param("i", $this->id);
+        $stmt->execute();
+
+        $result = $stmt->get_result()->fetch_assoc();
+        return (int) $result['total'];
+    }
+
+    public function getTotalListings() {
+        $mysqli = self::getDb();
+
+        $stmt = $mysqli->prepare(
+            "SELECT COUNT(*) AS total FROM items WHERE owner_id = ?"
+        );
+        $stmt->bind_param("i", $this->id);
+        $stmt->execute();
+
+        $result = $stmt->get_result()->fetch_assoc();
+        return (int) $result['total'];
+    }
+
+
+    public static function toggleUserStatus($userId, $newStatus) {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare(
+            "UPDATE users SET is_active = ? WHERE id = ?"
+        );
+        $stmt->bind_param("ii", $newStatus, $userId);
+        $stmt->execute();
+    }
+
+    public static function delete($userId) {
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare(
+            "DELETE FROM users WHERE id = ?"
+        );
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+    }
+}
 ?>

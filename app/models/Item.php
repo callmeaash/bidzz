@@ -42,6 +42,22 @@ class Item {
         return $mysqli;
     }
 
+    public static function create($owner_id, $title, $description, $category, $starting_bid, $duration, $image) {
+        $mysqli = self::getDb();
+        $end_at = date('Y-m-d H:i:s', strtotime("+{$duration} days"));
+
+        $stmt = $mysqli->prepare("
+            INSERT INTO items 
+            (owner_id, title, description, image, category, starting_bid, end_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("issssds", $owner_id, $title, $description, $image, $category, $starting_bid, $end_at);
+        
+        if ($stmt->execute()) {
+        return $mysqli->insert_id;
+    }
+    }
+
     public static function findById($id) {
         $mysqli = self::getDb();
         $stmt = $mysqli->prepare("SELECT * FROM items WHERE id = ?");

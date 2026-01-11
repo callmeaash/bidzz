@@ -72,6 +72,24 @@ CREATE TABLE reports (
     reason VARCHAR(255) NOT NULL,
     message TEXT,
     status ENUM('pending','resolved') NOT NULL DEFAULT 'pending',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (target_id) REFERENCES items(id) ON DELETE CASCADE
+);
+
+CREATE TABLE notifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    type ENUM('bid', 'comment', 'outbid', 'ending') NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    item_id INT NOT NULL,
+    item_name VARCHAR(255) NOT NULL,
+    triggered_by_user_id INT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (triggered_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );

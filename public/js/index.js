@@ -190,11 +190,193 @@ document.querySelectorAll('.favorite-btn').forEach(button => {
     })
 });
 
-document.getElementById('userIcon').addEventListener('click', toggleUserMenu);
+document.getElementById('userIcon').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('active');
+    document.getElementById('notificationPanel').classList.remove('active');
+});
+
 
 document.querySelectorAll('.auction-card').forEach((item) => {
     item.addEventListener('click', function() {
         const id = this.dataset.item_id;
         window.location = `/items/${id}`;
     });
+});
+
+function timeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return 'just now';
+
+    const intervals = {
+        year: 31536000,
+        month: 2592000,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+    };
+
+    for (const [unit, value] of Object.entries(intervals)) {
+        const count = Math.floor(seconds / value);
+        if (count >= 1) {
+            const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+            return rtf.format(-count, unit);
+        }
+    }
+
+    return 'just now';
+}
+
+async function renderNotifications() {
+    const notificationList = document.getElementById('notificationList');
+    
+    const res = await fetch('/notifications/get-notifications');
+    let notificationsData = await res.json();
+    console.log(notificationsData[0])
+
+    if (notificationsData.length === 0) {
+        document.getElementById('notificationBadge').style.display = 'none';
+        notificationList.innerHTML = `
+            <div class="notification-empty">
+                <i class="fa-regular fa-bell"></i>
+                <p>No notifications yet</p>
+            </div>
+        `;
+        return;
+    }
+
+    notificationsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    notificationList.innerHTML = notificationsData.map(notif => {
+        const iconClass = notif.type === 'bid' ? 'fa-gavel' : 
+                         notif.type === 'comment' ? 'fa-comment' : 
+                         notif.type === 'ending' ? 'fa-clock' :
+                         'fa-triangle-exclamation';
+        
+        return `
+            <div class="notification-item ${notif.is_read ? '' : 'unread'}" data-itemid="${notif.item_id}" data-id="${notif.id}">
+                <div class="notification-icon-wrapper ${notif.type}">
+                    <i class="fa-solid ${iconClass}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${notif.title}</div>
+                    <div class="notification-message">${notif.message}</div>
+                    <div class="notification-item-name">${notif.item_name}</div>
+                    <div class="notification-time">
+                        ${timeAgo(notif.created_at)}
+                        ${!notif.is_read ? '<span class="unread-indicator"></span>' : ''}
+                    </div>
+                </div>
+                <button class="notification-close" onclick="removeNotification(event, ${notif.id})">
+                    <i class="fa-solid fa-x"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    updateBadge(notificationsData);
+}
+
+function updateBadge(notificationsData) {
+    const unreadCount = notificationsData.filter(n => !n.is_read).length;
+    const badge = document.getElementById('notificationBadge');
+    
+    if (unreadCount > 0) {
+        badge.textContent = unreadCount;
+        badge.style.display = 'block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notificationPanel');
+    panel.classList.toggle('active');
+}
+
+async function markAllAsRead() {
+    await fetch('/notifications/read-all', {
+        method: 'POST'
+    });
+    await renderNotifications();
+}
+
+async function clearAllNotifications() {
+
+    await fetch('/notifications/delete-all', {
+        method: 'DELETE'
+    });
+    await renderNotifications();
+}
+
+
+function removeNotification(event, notifyID) {
+    event.stopPropagation();
+    const item = document.querySelector(`.notification-item[data-id="${notifyID}"]`);
+    if (item) item.remove();
+    const index = notificationsData.findIndex(n => n.id == notifyID);
+    if (index !== -1) {
+        notificationsData.splice(index, 1);
+        updateBadge(notificationsData);
+    }
+
+    fetch(`/notifications/delete/${notifyID}`, {
+        method: 'DELETE'
+    });
+
+}
+
+
+document.getElementById('notificationIcon').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleNotificationPanel();
+    document.getElementById('userMenu').classList.remove('active');
+});
+
+document.getElementById('markAllRead').addEventListener('click', (e) => {
+    e.stopPropagation();
+    markAllAsRead();
+});
+
+document.getElementById('clearAll').addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearAllNotifications();
+});
+
+
+document.addEventListener('click', (e) => {
+    const panel = document.getElementById('notificationPanel');
+    const icon = document.getElementById('notificationIcon');
+    
+    if (!icon.contains(e.target) && !panel.contains(e.target)) {
+        panel.classList.remove('active');
+    }
+});
+
+renderNotifications();
+setInterval(() => {
+    renderNotifications();
+}, 30000);
+
+document.getElementById('notificationList').addEventListener('click', e => {
+    const item = e.target.closest('.notification-item');
+    if (!item) return;
+
+    if (e.target.closest('.notification-close')) return;
+
+    const notifId = item.dataset.id;
+    item.classList.remove('unread');
+    const unreadIndicator = item.querySelector('.unread-indicator');
+    if (unreadIndicator) unreadIndicator.remove();
+
+    fetch(`/notifications/mark-read/${notifId}`, {
+            method: 'POST'
+    });
+
+    const itemId = item.dataset.itemid;
+    window.location.href = `/items/${itemId}`;
 });

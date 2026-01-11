@@ -265,27 +265,33 @@
     </div>
 
     <script>
-        // Countdown timer
-        setInterval(() => {
+        
+        function updateCountdown() {
             const timer = document.querySelector('#countdown');
-
             const text = timer.dataset.end;
             const endAt = new Date(text.replace(' ', 'T'));
             const now = new Date();
-        
+
             const diff = endAt - now;
-        
+
             if (diff <= 0) {
                 timer.textContent = "Auction Ended";
                 timer.style.color = "red";
                 return;
             }
+        
             const seconds = Math.floor((diff / 1000) % 60);
             const minutes = Math.floor((diff / 1000 / 60) % 60);
             const hours = Math.floor((diff / 1000 / 60 / 60) % 24);
             const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+        
             timer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }, 1000);
+        }
+
+        updateCountdown();
+
+        // Then start interval
+        setInterval(updateCountdown, 1000);
 
         bidForm = document.getElementById('bidForm')
         if (bidForm){
@@ -294,15 +300,24 @@
                 const bidInput = document.getElementById('bidInput').value.trim();
                 const currentBid = document.getElementById('bidInput').dataset.current_bid;
                 const minimumBid = document.querySelector('.minimum-bid');
-
                 if (bidInput <= currentBid) {
                     minimumBid.style.color = 'red';
                     return;
                 }
-                this.submit();
+                const formData = new FormData(this);
+                const itemId = document.body.dataset.id;
+                fetch(`/items/${itemId}/bid`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    window.location.replace(`/items/${itemId}?t=${Date.now()}`);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             });
         }
-
 
         function displayBidHistory(bids) {
             const container = document.querySelector("#bidHistory");
@@ -318,10 +333,10 @@
                                             : bid.username[0].toUpperCase()}</div>
                                     <div class="bid-details">
                                         <span class="bid-name">${bid.username}</span>
-                                        <span class="bid-time">1${bid.created_at}</span>
+                                        <span class="bid-time">${timeAgo(bid.created_at)}</span>
                                     </div>
                                 </div>
-                                <div class="bid-amount">$${bid.bid}</div>
+                                <div class="bid-amount">$${new Intl.NumberFormat().format(bid.bid)}</div>
                             </div>
                 `
             });
@@ -375,7 +390,7 @@
                                     <span class="comment-author">${comment.username}</span>
                                 </div>
                                 <p class="comment-text">${comment.comment}</p>
-                                <span class="comment-time">${comment.created_at}</span>
+                                <span class="comment-time">${timeAgo(comment.created_at)}</span>
                             </div>
                         </div>
                 `
@@ -403,6 +418,7 @@
                 })
                 .then(res => res.json())
                 .then(comments => {
+                    this.querySelector('.comment-input').value = '';
                     showComments(comments);
                 })
             })
@@ -450,12 +466,6 @@
                 toggleFavorite(button);
             });
         }
-
-        window.addEventListener('pageshow', function (event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
         
 
         const reportBtn = document.querySelector('.report-btn');
@@ -539,6 +549,33 @@
                     alert('An unexpected error occurred. Please try again later.');
                 }
             });
+        }
+
+        function timeAgo(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+                
+            const seconds = Math.floor((now - date) / 1000);
+                
+            if (seconds < 60) return 'just now';
+                
+            const intervals = {
+                year: 31536000,
+                month: 2592000,
+                day: 86400,
+                hour: 3600,
+                minute: 60
+            };
+        
+            for (const [unit, value] of Object.entries(intervals)) {
+                const count = Math.floor(seconds / value);
+                if (count >= 1) {
+                    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+                    return rtf.format(-count, unit);
+                }
+            }
+        
+            return 'just now';
         }
     </script>
 </body>

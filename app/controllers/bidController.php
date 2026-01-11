@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/Item.php';
+require_once __DIR__ . '/../models/Notification.php';
+require_once __DIR__ . '/../models/Bid.php';
 
 class BidController {
     public function handle($itemId) {
@@ -21,20 +23,48 @@ class BidController {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
             $bidAmount = trim($_POST['bid-amount']) ?? '';
 
             $item = Item::findbyId((int)$itemId);
 
             if ($bidAmount === '' || $bidAmount <= $item->current_bid){
                 $_SESSION['invalidBid'] = true;
+                header("Location: /items/{$itemId}");
+                exit();
             }
 
-            require_once __DIR__ . '/../models/Bid.php';
+            // Get the previous highest bidder before placing new bid
+            $previousBids = $item->getBids();
+            $previousHighestBid = !empty($previousBids) ? $previousBids[0] : null;
+            $previousBidderId = $previousHighestBid ? $previousHighestBid['user_id'] : null;
+
             Bid::add($_SESSION['user_id'], $itemId, $bidAmount);
 
+            // Notify item owner about new bid (only if bidder is not the owner)
+            if ($item->user_id != $_SESSION['user_id']) {
+                Notification::createBidNotification(
+                    $item->owner_id,
+                    $itemId,
+                    $item->title,
+                    $_SESSION['user_id'],
+                    $_SESSION['username'],
+                    $bidAmount
+                );
+            }
+
+            // Notify previous highest bidder that they were outbid (if exists and not the current bidder)
+            if ($previousBidderId && $previousBidderId != $_SESSION['user_id']) {
+                Notification::createOutbidNotification(
+                    $previousBidderId,
+                    $itemId,
+                    $item->title,
+                    $bidAmount,
+                    $_SESSION['user_id']
+                );
+            }
 
             header("Location: /items/{$itemId}");
-
             exit;
         }
     }

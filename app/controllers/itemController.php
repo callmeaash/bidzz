@@ -4,7 +4,7 @@ class ItemController {
 
     public function handle($itemId) {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
+            
             require_once __DIR__ . '/../models/Item.php';
             require_once __DIR__ . '/../models/Watchlist.php';
             require_once __DIR__ . '/../models/User.php';
