@@ -155,7 +155,7 @@ document.addEventListener('click', function(event) {
 });
 
 // Update countdown timers
-setInterval(() => {
+function countdownTimer() {
     document.querySelectorAll('.info-value').forEach(timer => {
                 
         const text = timer.dataset.end;
@@ -176,7 +176,9 @@ setInterval(() => {
         
         timer.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     });
-}, 1000);
+}
+countdownTimer();
+setInterval(1000, countdownTimer);
 
 document.querySelectorAll('.favorite-btn').forEach(button => {
     button.addEventListener('click', () => {
@@ -255,6 +257,8 @@ async function renderNotifications() {
         const iconClass = notif.type === 'bid' ? 'fa-gavel' : 
                          notif.type === 'comment' ? 'fa-comment' : 
                          notif.type === 'ending' ? 'fa-clock' :
+                         notif.type === 'won' ? 'fa-trophy' :
+                         notif.type === 'ended' ? 'fa-flag-checkered':
                          'fa-triangle-exclamation';
         
         return `

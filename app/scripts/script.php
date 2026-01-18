@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/utils.php';
+require_once __DIR__ . '/../models/Notification.php';
 
 if (!$mysqli) {
     Logger::error(basename(__FILE__), "MySQLi not initialized");
@@ -8,9 +9,11 @@ if (!$mysqli) {
 }
 
 $sql = "
-    SELECT id
+    SELECT id, title, owner_id
     FROM items
     WHERE end_at <= NOW()
+      AND is_active = 1
+      AND winner_id IS NULL
 ";
 
 $result = $mysqli->query($sql);
@@ -21,58 +24,79 @@ if (!$result) {
 }
 
 while ($item = $result->fetch_assoc()) {
-    $itemId = (int)$item['id'];
 
-    $winnerSql = "
-        SELECT user_id
-        FROM bids
-        WHERE item_id = ?
-        ORDER BY bid DESC, created_at ASC
-        LIMIT 1
-    ";
+    $itemId   = (int)$item['id'];
+    $itemName = $item['title'];
+    $ownerId  = (int)$item['owner_id'];
 
-    $winnerStmt = $mysqli->prepare($winnerSql);
-    if (!$winnerStmt) {
-        Logger::error(basename(__FILE__), "Prepare failed (winner)", $mysqli->error);
-        continue;
-    }
+    $mysqli->begin_transaction();
 
-    $winnerStmt->bind_param("i", $itemId);
-    $winnerStmt->execute();
-    $winnerResult = $winnerStmt->get_result();
-    $winnerRow = $winnerResult->fetch_assoc();
-    $winnerStmt->close();
+    try {
+        $winnerSql = "
+            SELECT user_id, bid
+            FROM bids
+            WHERE item_id = ?
+            ORDER BY bid DESC, created_at ASC
+            LIMIT 1
+        ";
 
-    $winnerId = $winnerRow ? (int)$winnerRow['user_id'] : NULL;
+        $winnerStmt = $mysqli->prepare($winnerSql);
+        if (!$winnerStmt) {
+            throw new Exception("Prepare failed (winner)");
+        }
 
-    $updateSql = "
-        UPDATE items
-        SET is_active = 0,
-            winner_id = ?
-        WHERE id = ?
-    ";
+        $winnerStmt->bind_param("i", $itemId);
+        $winnerStmt->execute();
+        $winnerResult = $winnerStmt->get_result();
+        $winnerRow = $winnerResult->fetch_assoc();
+        $winnerStmt->close();
 
-    $updateStmt = $mysqli->prepare($updateSql);
-    if (!$updateStmt) {
-        Logger::error(basename(__FILE__), "Prepare failed (update)", $mysqli->error);
-        continue;
-    }
+        $winnerId = $winnerRow ? (int)$winnerRow['user_id'] : null;
+        $finalBid = $winnerRow ? (float)$winnerRow['bid'] : null;
 
-    if ($winnerId === NULL) {
-        $updateStmt->bind_param("si", $winnerId, $itemId);
-    } else {
-        $updateStmt->bind_param("ii", $winnerId, $itemId);
-    }
+        $updateSql = "
+            UPDATE items
+            SET is_active = 0,
+                winner_id = ?,
+                current_bid = ?
+            WHERE id = ?
+        ";
 
-    if (!$updateStmt->execute()) {
+        $updateStmt = $mysqli->prepare($updateSql);
+        if (!$updateStmt) {
+            throw new Exception("Prepare failed (update)");
+        }
+
+        $updateStmt->bind_param("idi", $winnerId, $finalBid, $itemId);
+        $updateStmt->execute();
+        $updateStmt->close();
+
+        if ($winnerId !== null) {
+            Notification::createWonNotification(
+                $winnerId,
+                $itemId,
+                $itemName
+            );
+        }
+
+        Notification::createAuctionEndedNotification(
+            $ownerId,
+            $itemId,
+            $itemName,
+            $winnerId !== null
+        );
+
+        $mysqli->commit();
+
+    } catch (Exception $e) {
+        $mysqli->rollback();
+
         Logger::error(
             basename(__FILE__),
-            "Failed to update item {$itemId}",
-            $updateStmt->error
+            "Failed processing item {$itemId}",
+            $e->getMessage()
         );
     }
-
-    $updateStmt->close();
 }
 
 $mysqli->close();

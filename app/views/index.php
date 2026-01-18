@@ -181,6 +181,14 @@
             background-color: #fef3c7;
         }
 
+        .notification-icon-wrapper.won {
+            background-color: #b8eba2;;
+        }
+
+        .notification-icon-wrapper.ended {
+            background-color: #e5e7eb;
+        }
+
         .notification-icon-wrapper i {
             font-size: 16px;
         }
@@ -199,6 +207,14 @@
 
         .notification-icon-wrapper.ending i {
             color: #f59e0b;
+        }
+
+        .notification-icon-wrapper.won i {
+            color: #dba719;
+        }
+
+        .notification-icon-wrapper.ended i {
+            color: #374151;
         }
 
         .notification-content {

@@ -182,5 +182,33 @@ class Notification {
             null
         );
     }
+
+    public static function createWonNotification($winner_id, $item_id, $item_name) {
+        return self::create(
+            $winner_id,
+            'won',
+            'You Won the Auction!',
+            "Congratulations! You won the auction.",
+            $item_id,
+            $item_name,
+            null
+        );
+    }
+
+    public static function createAuctionEndedNotification($seller_id, $item_id, $item_name, $hasWinner = true) {
+    $message = $hasWinner
+        ? "Your item has been sold."
+        : "Your item ended with no bids.";
+
+    return self::create(
+        $seller_id,
+        'ended',
+        'Auction Ended',
+        $message,
+        $item_id,
+        $item_name,
+        null
+    );
+}
 }
 ?>

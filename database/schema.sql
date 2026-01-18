@@ -80,7 +80,7 @@ CREATE TABLE reports (
 CREATE TABLE notifications (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    type ENUM('bid', 'comment', 'outbid', 'ending') NOT NULL,
+    type ENUM('bid', 'comment', 'outbid', 'ending', 'won', 'ended') NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     item_id INT NOT NULL,
