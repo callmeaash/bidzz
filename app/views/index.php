@@ -625,9 +625,9 @@
     </div>
 
     <script src="/js/index.js"></script>
-</body>
 <?php
 require_once __DIR__ . '/../../includes/flash.php';
 echo renderFlash();
 ?>
+</body>
 </html>
