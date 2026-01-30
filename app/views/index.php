@@ -287,6 +287,173 @@
         .notification-empty p {
             font-size: 14px;
         }
+
+        .tabs {
+          display: inline-flex;
+          background: #e3e0e0;
+          padding: 4px;
+          border-radius: 999px;
+          margin-bottom: 20px;
+        }
+
+        .tab {
+          border: none;
+          background: transparent;
+          padding: 8px 16px;
+          border-radius: 999px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          color: #333;
+          transition: all 0.2s ease;
+        }
+
+        .tab:hover {
+          background: #e6e6e6;
+        }
+
+        .tab.active {
+          background: #ffffff;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-items {
+            width: 100%;
+            text-align: center;
+            padding: 60px 20px;
+            color: #232222;
+        }
+
+        .no-items i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .no-items p {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 500px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.flash-message.hiding {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.flash-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.flash-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.flash-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.flash-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.flash-icon::before {
+    font-size: 18px;
+}
+
+.flash-success .flash-icon::before {
+    content: '✓';
+}
+
+.flash-error .flash-icon::before {
+    content: '✗';
+}
+
+.flash-warning .flash-icon::before {
+    content: '⚠';
+}
+
+.flash-info .flash-icon::before {
+    content: 'ℹ';
+}
+
+.flash-text {
+    flex: 1;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .flash-message {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+
     </style>
 </head>
 <body>
@@ -393,7 +560,17 @@
             </div>
         </div>
 
+        <div class="tabs">
+          <button class="tab active">Active Auctions</button>
+          <button class="tab">Ended Auctions</button>
+        </div>
+        <div id="noItemsMessage" class="no-items">
+            <i class="fa-regular fa-box-open"></i>
+            <p>No items found</p>
+        </div>
+
         <div class="auction-grid" id="activeAuctions">
+
             <?php foreach($items as $item): ?>
             <div class="auction-card"
                 data-category="<?= $item->category ?>"
@@ -402,6 +579,7 @@
                 data-start="<?= $item->created_at ?>"
                 data-currentbid="<?= $item->current_bid ?>"
                 data-item_id="<?= $item->id ?>"
+                data-item-status="<?= $item->is_active ?>"
             >
                 <div class="image-container">
                     <img src="<?= $item->image ?>" alt="<?= $item->title ?>" class="auction-image">
@@ -448,4 +626,8 @@
 
     <script src="/js/index.js"></script>
 </body>
+<?php
+require_once __DIR__ . '/../../includes/flash.php';
+echo renderFlash();
+?>
 </html>

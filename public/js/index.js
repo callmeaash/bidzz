@@ -12,6 +12,9 @@ window.addEventListener('scroll', () => {
     header.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
 });
 
+const tabs = document.querySelectorAll('.tab');
+let currentStatusFilter = 'active';
+
 function toggleFavorite(event, button) {
     event.stopPropagation();
     const isActive = button.classList.toggle('active');
@@ -86,21 +89,28 @@ function applyFilters() {
     const query = document.getElementById('searchInput').value.toLowerCase();
 
     const items = document.querySelectorAll('.auction-card');
+    let visibleCount = 0;
 
     items.forEach(item => {
         const itemCategory = item.dataset.category;
         const itemTitle = item.dataset.title.toLowerCase();
-        // Check all filters
-        const categoryMatch = category === 'All Categories' || itemCategory === category;
+        const isActive = item.dataset.itemStatus === "1";
+
+        const statusMatch =
+            (currentStatusFilter === 'active' && isActive) ||
+            (currentStatusFilter === 'ended' && !isActive);
+
+        const categoryMatch =
+            category === 'All Categories' || itemCategory === category;
+
         const searchMatch = itemTitle.includes(query);
-    
-        if (categoryMatch && searchMatch) {
-            // Show item with animation
+
+        if (statusMatch && categoryMatch && searchMatch) {
+            visibleCount++;
             item.style.display = 'block';
             void item.offsetWidth;
             item.classList.remove('hide');
         } else {
-            // Hide item with animation
             item.classList.add('hide');
             item.addEventListener('transitionend', () => {
                 if (item.classList.contains('hide')) {
@@ -109,7 +119,24 @@ function applyFilters() {
             }, { once: true });
         }
     });
+
+    document.getElementById('noItemsMessage').style.display =
+        visibleCount === 0 ? 'block' : 'none';
 }
+
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        currentStatusFilter = tab.textContent.includes('Active')
+            ? 'active'
+            : 'ended';
+
+        applyFilters();
+    });
+});
 
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
@@ -384,3 +411,20 @@ document.getElementById('notificationList').addEventListener('click', e => {
     const itemId = item.dataset.itemid;
     window.location.href = `/items/${itemId}`;
 });
+
+function closeFlash() {
+    const flash = document.getElementById('flashMessage');
+    if (flash) {
+        flash.classList.add('hiding');
+        setTimeout(() => flash.remove(), 300);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const flash = document.getElementById('flashMessage');
+    if (flash) {
+        setTimeout(() => closeFlash(), 5000);
+    }
+});
+
+applyFilters();
