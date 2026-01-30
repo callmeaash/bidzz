@@ -14,6 +14,7 @@ window.addEventListener('scroll', () => {
 
 const tabs = document.querySelectorAll('.tab');
 let currentStatusFilter = 'active';
+applyFilters();
 
 function toggleFavorite(event, button) {
     event.stopPropagation();
@@ -94,7 +95,7 @@ function applyFilters() {
     items.forEach(item => {
         const itemCategory = item.dataset.category;
         const itemTitle = item.dataset.title.toLowerCase();
-        const isActive = item.dataset.itemStatus === "1";
+        const isActive = item.dataset.itemstatus === "1";
 
         const statusMatch =
             (currentStatusFilter === 'active' && isActive) ||
@@ -123,7 +124,6 @@ function applyFilters() {
     document.getElementById('noItemsMessage').style.display =
         visibleCount === 0 ? 'block' : 'none';
 }
-
 
 tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -426,5 +426,3 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => closeFlash(), 5000);
     }
 });
-
-applyFilters();

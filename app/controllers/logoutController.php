@@ -7,28 +7,25 @@ class LogoutController {
         // Store username for flash message
         $username = $_SESSION['username'] ?? 'User';
         
-        // Set flash message before destroying session
-        setFlash('success', 'Goodbye, ' . $username . '. You have been logged out successfully.');
-        
-        // Keep flash message in a temporary variable
-        $flashMessage = $_SESSION['flash'];
-        
-        // Clear session
+        // Clear all session data except we'll set flash in new session
         $_SESSION = [];
-        
-        // Restore flash message
-        $_SESSION['flash'] = $flashMessage;
         
         // Destroy session cookie
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time() - 3600, '/');
         }
         
+        // Destroy the session
         session_destroy();
         
-        // Start new session for flash message
+        // Start a fresh session for the flash message
         session_start();
-        $_SESSION['flash'] = $flashMessage;
+        
+        // Set the flash message in the new session
+        $_SESSION['flash'] = [
+            'type' => 'success',
+            'message' => 'Goodbye, ' . $username . '. You have been logged out successfully.'
+        ];
         
         header("Location: /");
         exit;

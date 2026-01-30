@@ -457,6 +457,11 @@
     </style>
 </head>
 <body>
+    <?php
+        require_once __DIR__ . '/../../includes/flash.php';
+        var_dump($_SESSION);
+        echo renderFlash();
+    ?>
     <div class="navbar">
         <div class="logo-section">
             <div class="logo"><img src="images/logo.png" alt="Logo"></div>
@@ -579,7 +584,7 @@
                 data-start="<?= $item->created_at ?>"
                 data-currentbid="<?= $item->current_bid ?>"
                 data-item_id="<?= $item->id ?>"
-                data-item-status="<?= $item->is_active ?>"
+                data-itemstatus="<?= $item->is_active ?>"
             >
                 <div class="image-container">
                     <img src="<?= $item->image ?>" alt="<?= $item->title ?>" class="auction-image">
@@ -625,9 +630,5 @@
     </div>
 
     <script src="/js/index.js"></script>
-<?php
-require_once __DIR__ . '/../../includes/flash.php';
-echo renderFlash();
-?>
 </body>
 </html>

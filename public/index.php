@@ -1,7 +1,8 @@
 <?php
 
-// Starts a new session
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $uri = parse_url($requestUri, PHP_URL_PATH);
