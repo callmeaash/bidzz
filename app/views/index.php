@@ -459,7 +459,6 @@
 <body>
     <?php
         require_once __DIR__ . '/../../includes/flash.php';
-        var_dump($_SESSION);
         echo renderFlash();
     ?>
     <div class="navbar">
@@ -477,7 +476,7 @@
             <?php if (isset($_SESSION['user_id'])): ?>
             <div class="notification-icon" id="notificationIcon">
                 <i class="fa-regular fa-bell"></i>
-                <span class="notification-badge" id="notificationBadge">2</span>
+                <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
                 
                 <!-- Notification Panel -->
                 <div class="notification-panel" id="notificationPanel">
@@ -517,8 +516,8 @@
                         <p><?= $_SESSION['email'] ?></p>
                     </div>
                     <a href="/my-bids" class="user-menu-item">My Bids</a>
-                    <a href="/my-listing" class="user-menu-item">My Listings</a>
-                    <a href="/watchlist" class="user-menu-item">Watchlists</a>
+                    <a href="/my-listings" class="user-menu-item">My Listings</a>
+                    <a href="/watchlists" class="user-menu-item">Watchlists</a>
                     <a href="/me" class="user-menu-item">Settings</a>
                     <a href="/logout" class="user-menu-item">
                         <i class="fa-solid fa-arrow-right-from-bracket logout-icon"></i>

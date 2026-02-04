@@ -244,31 +244,31 @@ class Item {
     }
 
     public static function getHighestBid($itemId) {
-    $mysqli = self::getDb();
-    $stmt = $mysqli->prepare("
-        SELECT b.bid, u.username, u.id as user_id
-        FROM bids b
-        JOIN users u ON b.user_id = u.id
-        WHERE b.item_id = ?
-        ORDER BY b.bid DESC, b.created_at ASC
-        LIMIT 1
-    ");
-    $stmt->bind_param("i", $itemId);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+        $mysqli = self::getDb();
+        $stmt = $mysqli->prepare("
+            SELECT b.bid, u.username, u.id as user_id
+            FROM bids b
+            JOIN users u ON b.user_id = u.id
+            WHERE b.item_id = ?
+            ORDER BY b.bid DESC, b.created_at ASC
+            LIMIT 1
+        ");
+        $stmt->bind_param("i", $itemId);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
 
-    if ($res) {
-        return [
-            'bid' => (float)$res['bid'],
-            'username' => $res['username'],
-            'user_id' => $res['user_id']
-        ];
+        if ($res) {
+            return [
+                'bid' => (float)$res['bid'],
+                'username' => $res['username'],
+                'user_id' => $res['user_id']
+            ];
+        }
+
+        // No bids yet
+        return null;
     }
-
-    // No bids yet
-    return null;
-}
 }
 
 ?>

@@ -78,6 +78,9 @@ class ListingController {
 
             move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath);
 
+            require_once __DIR__ . '/../../includes/flash.php';
+            
+            setFlash('success', 'Item listed successfully');
             header('Location: /');
             exit;
 

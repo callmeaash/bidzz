@@ -98,10 +98,13 @@
             font-weight: 600;
             margin-bottom: 5px;
         }
-
-        .bid-actions {
+        
+        .btn-container {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 10px;
+            margin-top: 20px;
+
         }
 
         .btn {
@@ -284,8 +287,9 @@
                 font-weight: 600;
             }
 
-            .bid-actions {
-                flex-direction: column;
+            .btn-container {
+                display: flex;
+                width: 100%;
             }
 
             .btn {
@@ -294,11 +298,133 @@
             }
     }
 
+    .flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 500px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.flash-message.hiding {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.flash-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.flash-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.flash-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.flash-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.flash-icon::before {
+    font-size: 18px;
+}
+
+.flash-success .flash-icon::before {
+    content: '✓';
+}
+
+.flash-error .flash-icon::before {
+    content: '✗';
+}
+
+.flash-warning .flash-icon::before {
+    content: '⚠';
+}
+
+.flash-info .flash-icon::before {
+    content: 'ℹ';
+}
+
+.flash-text {
+    flex: 1;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .flash-message {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        max-width: none;
+    }
+}
+
 
         
     </style>
 </head>
 <body>
+    <?php
+        require_once __DIR__ . '/../../includes/flash.php';
+        echo renderFlash();
+    ?>
     <header class="header">
         <div class="header-content">
             <button class="back-btn" onclick="history.back()"> <i class="fa-solid fa-arrow-left"></i></button>
@@ -383,8 +509,15 @@
                             <span class="stat-label">Time Left</span>
                             <span class="stat-data item-time" data-end="<?= $item->end_at ?>">19h 59m</span>
                         </div>
-                        <div class="bid-actions">
+                    
+                    </div>
+
+                    <div class='btn-container'>
+                        <div>
                             <a href="/items/<?= $item->id ?>" class="btn btn-outline">👁 View Item</a>
+                        </div>
+                        <div>
+                            <a href="/my-listings/<?= $item->id ?>/delete" class="btn btn-outline"><i class="fa-solid fa-trash" style="color:red;"></i> Delete</a>
                         </div>
                     </div>
                 </div>

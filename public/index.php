@@ -73,7 +73,7 @@ switch($segments[0]){
         }
         break;
 
-    case 'watchlist':
+    case 'watchlists':
         require_once __DIR__ . '/../includes/auth.php';
         requireLogin();
         require_once __DIR__ . '/../app/controllers/watchlistController.php';
@@ -87,10 +87,17 @@ switch($segments[0]){
         (new WatchlistController())->getWatchlists();
         break;
 
-    case 'my-listing':
+    case 'my-listings':
+        $itemId = $segments[1] ?? null;
+        $action = $segments[2] ?? null;
         require_once __DIR__ . '/../includes/auth.php';
         requireLogin();
         require_once __DIR__ . '/../app/controllers/myListingsController.php';
+
+        if ($action === 'delete'){
+            (new MyListingsContoller())->deleteItem($itemId);
+            break;
+        }
         (new MyListingsContoller())->handle();
         break;
 

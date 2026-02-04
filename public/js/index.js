@@ -14,7 +14,9 @@ window.addEventListener('scroll', () => {
 
 const tabs = document.querySelectorAll('.tab');
 let currentStatusFilter = 'active';
+let isInitialLoad = true;
 applyFilters();
+isInitialLoad = false;
 
 function toggleFavorite(event, button) {
     event.stopPropagation();
@@ -108,16 +110,30 @@ function applyFilters() {
 
         if (statusMatch && categoryMatch && searchMatch) {
             visibleCount++;
-            item.style.display = 'block';
-            void item.offsetWidth;
-            item.classList.remove('hide');
+            if (isInitialLoad) {
+                // On initial load, just show items without animation
+                item.style.display = 'block';
+                item.classList.remove('hide');
+            } else {
+                // After initial load, use animation
+                item.style.display = 'block';
+                void item.offsetWidth;
+                item.classList.remove('hide');
+            }
         } else {
-            item.classList.add('hide');
-            item.addEventListener('transitionend', () => {
-                if (item.classList.contains('hide')) {
-                    item.style.display = 'none';
-                }
-            }, { once: true });
+            if (isInitialLoad) {
+                // On initial load, just hide items without animation
+                item.style.display = 'none';
+                item.classList.add('hide');
+            } else {
+                // After initial load, use animation
+                item.classList.add('hide');
+                item.addEventListener('transitionend', () => {
+                    if (item.classList.contains('hide')) {
+                        item.style.display = 'none';
+                    }
+                }, { once: true });
+            }
         }
     });
 
@@ -360,7 +376,6 @@ function removeNotification(event, notifyID) {
     });
 
 }
-
 
 document.getElementById('notificationIcon').addEventListener('click', (e) => {
     e.stopPropagation();
