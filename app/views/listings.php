@@ -416,15 +416,10 @@
     }
 }
 
-
         
     </style>
 </head>
 <body>
-    <?php
-        require_once __DIR__ . '/../../includes/flash.php';
-        echo renderFlash();
-    ?>
     <header class="header">
         <div class="header-content">
             <button class="back-btn" onclick="history.back()"> <i class="fa-solid fa-arrow-left"></i></button>
@@ -517,7 +512,7 @@
                             <a href="/items/<?= $item->id ?>" class="btn btn-outline">👁 View Item</a>
                         </div>
                         <div>
-                            <a href="/my-listings/<?= $item->id ?>/delete" class="btn btn-outline"><i class="fa-solid fa-trash" style="color:red;"></i> Delete</a>
+                            <a data-id="<?= $item->id ?>" class="btn btn-outline deleteBtn" onclick="deleteItem(event, <?= $item->id ?>)"><i class="fa-solid fa-trash" style="color:red;"></i> Delete</a>
                         </div>
                     </div>
                 </div>
@@ -528,13 +523,65 @@
 
     <script>
 
-        document.querySelectorAll('.listing-card').forEach(item => {
-            const id = item.dataset.id;
-            item.addEventListener('click', () => {
-                window.location.href = `/items/${id}`;
-            })
+        async function deleteItem(e, itemId) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm('Are you sure you want to delete this item?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/my-listings/${itemId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Remove the item from DOM
+            const card = document.querySelector(`[data-id="${itemId}"]`);
+            if (card) {
+                card.remove();
+            }
+            
+            // Show success message
+            showNotification('Item deleted successfully', 'success');
+            
+            // Reload page after a short delay to update stats
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showNotification(data.message || 'Failed to delete item', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('An error occurred while deleting the item', 'error');
+    }
+}
 
+function showNotification(message, type = 'error') {
+    // Create a simple notification (or use your existing flash message system)
+    const notification = document.createElement('div');
+    notification.className = `flash-message flash-${type}`;
+    notification.innerHTML = `
+        <span class="flash-icon"></span>
+        <span class="flash-text">${message}</span>
+        <button class="flash-close" onclick="this.parentElement.remove();">&times;</button>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 3000);
+}
 
         setInterval(() => {
             document.querySelectorAll('.item-time').forEach(timer => {
