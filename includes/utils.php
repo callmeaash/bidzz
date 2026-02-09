@@ -1,10 +1,10 @@
 <?php
 function validate_username($username) {
-    return preg_match("/^[a-zA-Z][a-zA-Z0-9_\.]{2,19}$/", $username);
+    return preg_match("/^[a-zA-Z][a-zA-Z0-9_]{2,19}$/", $username);
 }
 
 function validate_password($password) {
-    return preg_match("/^(?=.*[0-9]).{8,}$/", $password);
+    return preg_match("/^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]).{8,}$/", $password);
 }
 
 function validate_email($email) {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=trophy" />
     <title>My Bids</title>
     <style>
@@ -224,12 +225,6 @@
             font-size: 14px;
             color: #888;
             margin-bottom: 10px;
-        }
-
-        .bid-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .alert {
@@ -550,7 +545,7 @@
                                     </div>
                                 </div>
                                 <div class="bid-meta">
-                                    <span>⏱ Ends <?= date('M d, Y H:i', strtotime($item['item']->end_at)) ?></span>
+                                    <span><i class='fa-regular fa-clock'></i> Ends <?= date('M d, Y H:i', strtotime($item['item']->end_at)) ?></span>
                                 </div>
                                 <div class="bid-actions">
                                     <a href="/items/<?= $item['item']->id ?>" class="btn btn-outline">👁 View Item</a>

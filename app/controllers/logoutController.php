@@ -5,7 +5,9 @@ class LogoutController {
 
     public function handle() {
         
-        $_SESSION = [];
+        session_destroy();
+        sleep(2);
+        session_start();
         
         setFlash('success', 'You have been logged out successfully.');
         

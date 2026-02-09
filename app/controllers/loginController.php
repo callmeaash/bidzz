@@ -29,10 +29,10 @@ class LoginController{
             $user = User::findByUsername($username);
 
             if ($password === ''){
-                $errors['password'] = '✗ Password is required';
+                $errors['password'] = '<i class="fa-solid fa-x"></i> Password is required';
 
             } elseif (empty($user) || !verify_password($password, $user->password)){
-                $errors['password'] = '✗ Invalid username or password';
+                $errors['password'] = '<i class="fa-solid fa-x"></i> Invalid username or password';
             }
 
         } catch (Exception $e){

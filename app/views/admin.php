@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
     <style>
         * {
@@ -61,6 +62,15 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .admin-btn:hover {
+            background: #b91c1c;
         }
 
         .tabs {
@@ -540,7 +550,10 @@
                 <p>Manage auctions, reports, and monitor activity</p>
             </div>
         </div>
-        <button class="admin-btn">Admin</button>
+        <a href="/admin/logout" class="admin-btn" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: white;">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            Logout
+        </a>
     </header>
 
     <nav class="tabs">

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
     <title>Profile Settings</title>
     <style>

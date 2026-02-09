@@ -145,25 +145,24 @@ switch($segments[0]){
         require_once __DIR__ . '/../app/controllers/adminController.php';
         $action = $segments[1] ?? null;
         $Id = $segments[2] ?? null;
+        requireAdminLogin();
 
         if ($action == 'toggle-user-status') {
-            requireAdminLogin();
             (new AdminController())->toggleUserStatus();
         }
         elseif ($action == 'delete-user') {
-            requireAdminLogin();
             (new AdminController())->deleteUser($Id);
         }
         elseif ($action == 'delete-item') {
-            requireAdminLogin();
             (new AdminController())->deleteItem($Id);
         }
         elseif ($action == 'resolve-report') {
-            requireAdminLogin();
             (new AdminController())->updateReportStatus();
         }
+        elseif ($action == 'logout') {
+            (new AdminController())->logout();
+        }
         else {
-            requireAdminLogin();
             (new AdminController())->handle();
         }
         break;

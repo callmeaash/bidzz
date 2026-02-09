@@ -31,10 +31,22 @@ function checkUsername() {
     const usernameInput = document.getElementById('username');
     const username = usernameInput ? usernameInput.value.trim() : '';
 
+    if (username === '') {
+        clearValidation('username');
+        return false;
+    }
+
+    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/;
+    
+    if (!usernameRegex.test(username)) {
+        showError('username', '✗ Username must start with letter, 3-20 chars, only letters/numbers/_');
+        return false;
+    }
+
     fetch(`/check-username?username=${encodeURIComponent(username)}`)
         .then(response => response.json())
         .then(data => {
-            if (!data.available) {
+            if (!data.success) {
                 showError('username', data.message);
             } else {
                 showSuccess('username', data.message);
@@ -42,7 +54,6 @@ function checkUsername() {
         })
         .catch(err => console.error(err));
 };
-
 
 function checkEmail() {
     const email = document.getElementById('email').value.trim();
@@ -56,7 +67,7 @@ function checkEmail() {
         showError('email', '✗ Please enter a valid email address');
         return false;
     }
-    showSuccess('email', 'Valid email address');
+    showSuccess('email', '✓ Valid email address');
     return true;
 }
 
@@ -68,15 +79,15 @@ function checkPassword() {
         return false;
     }
 
-    const regex = /^(?=.*[0-9]).{8,}$/;
+    const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]).{8,}$/;
 
     if (!regex.test(password)) {
-        showError('password', '✗ Password must be 8+ chars & include a number');
+        showError('password', '✗ Password must be 8+ chars & include a letter, number & symbol');
         return false;
 
     } else {
         showSuccess('password', '✓ Password meets requirements');
-        checkConfirmPassword(); // Re-check confirm password when password changes
+        checkConfirmPassword();
         return true;
     }
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/6565cff68b.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/listing.css">
     <title>Create New Listing</title>
 </head>
@@ -100,7 +101,7 @@
 
                         <div class="form-group">
                             <label>Starting Bid ($)<span class="required">*</span></label>
-                            <input type="number" id="startingBid" name="startingBid" placeholder="0.00" min="0" step="0.01" value="0.00" oninput="updateSummary()">
+                            <input type="number" id="startingBid" name="startingBid" placeholder="0.00" min="0" step="0.01" oninput="updateSummary()">
                             <div id="startingBid-validation" class="validation-message <?= isset($errors['startingBid'])? 'error' : '' ?>">
                                 <?= $errors['startingBid'] ?? '' ?>
                             </div>

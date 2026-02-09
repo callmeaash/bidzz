@@ -12,9 +12,11 @@ class AjaxController{
             $user = User::findByUsername($username);
             
             if (!empty($user)){
-                echo json_encode(['available' => false, 'message' => 'Username already taken']);
-            } else {
-                echo json_encode(['available' => true, 'message' => 'Username available']);
+                echo json_encode(['success' => false, 'message' => 'Username already taken']);
+            }
+
+            else {
+                echo json_encode(['success' => true, 'message' => 'Username available']);
             }
 
         } catch (Exception $e) {

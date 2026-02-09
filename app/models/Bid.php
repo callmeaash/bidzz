@@ -2,22 +2,55 @@
 require_once __DIR__ . '/../../includes/db.php';
 
 class Bid {
-    public static function add($user_id, $item_id, $bid_amount) {
+    private static function getDb() {
         global $mysqli;
-        $stmt = $mysqli->prepare("INSERT INTO bids (user_id, item_id, bid) VALUES (?, ?, ?)");
-        $stmt->bind_param("iid", $user_id, $item_id, $bid_amount);
-        $stmt->execute();
+        
+        if ($mysqli === null) {
+            throw new Exception("Database connection not available", 500);
+        }
+        
+        return $mysqli;
+    }
 
-        // Update current bid of item
-        $stmt2 = $mysqli->prepare("UPDATE items SET current_bid=? WHERE id=?");
-        $stmt2->bind_param("di", $bid_amount, $item_id);
-        $stmt2->execute();
+    public static function add($user_id, $item_id, $bid_amount) {
+        $mysqli = self::getDb();
+        try {
+            $mysqli->begin_transaction();
 
-        return $mysqli->insert_id;
+            $stmt = $mysqli->prepare("INSERT INTO bids (user_id, item_id, bid) VALUES (?, ?, ?)");
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $mysqli->error);
+            }
+            $stmt->bind_param("iid", $user_id, $item_id, $bid_amount);
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+            $bid_id = $mysqli->insert_id;
+            $stmt->close();
+
+            $stmt2 = $mysqli->prepare("UPDATE items SET current_bid=? WHERE id=?");
+            if (!$stmt2) {
+                throw new Exception("Prepare failed: " . $mysqli->error);
+            }
+            $stmt2->bind_param("di", $bid_amount, $item_id);
+            if (!$stmt2->execute()) {
+                throw new Exception("Execute failed: " . $stmt2->error);
+            }
+            $stmt2->close();
+
+            $mysqli->commit();
+            return $bid_id;
+
+        } catch (Exception $e) {
+            $mysqli->rollback();
+            require_once __DIR__ . '/../../includes/utils.php';
+            Logger::error("Bid.php", "Failed to add bid for user {$user_id}", $e->getMessage());
+            throw $e;
+        }
     }
 
     public static function getUserLastBids($user_id) {
-        global $mysqli;
+        $mysqli = self::getDb();
         $sql = "
             SELECT b1.item_id, b1.bid, b1.created_at
             FROM bids b1

@@ -5,7 +5,6 @@ require_once __DIR__ . '/../models/Bid.php';
 
 class BidController {
     public function handle($itemId) {
-
         if ($_SERVER['REQUEST_METHOD'] === 'GET'){
             try {
                 $item = Item::findById($itemId);
@@ -23,9 +22,7 @@ class BidController {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
             $bidAmount = trim($_POST['bid-amount']) ?? '';
-
             $item = Item::findbyId((int)$itemId);
 
             if ($bidAmount === '' || $bidAmount <= $item->current_bid){
@@ -34,38 +31,45 @@ class BidController {
                 exit();
             }
 
-            // Get the previous highest bidder before placing new bid
-            $previousBids = $item->getBids();
-            $previousHighestBid = !empty($previousBids) ? $previousBids[0] : null;
-            $previousBidderId = $previousHighestBid ? $previousHighestBid['user_id'] : null;
+            try {
+                $previousBids = $item->getBids();
+                $previousHighestBid = !empty($previousBids) ? $previousBids[0] : null;
+                $previousBidderId = $previousHighestBid ? $previousHighestBid['user_id'] : null;
 
-            Bid::add($_SESSION['user_id'], $itemId, $bidAmount);
+                Bid::add($_SESSION['user_id'], $itemId, $bidAmount);
 
-            // Notify item owner about new bid (only if bidder is not the owner)
-            if ($item->user_id != $_SESSION['user_id']) {
-                Notification::createBidNotification(
-                    $item->owner_id,
-                    $itemId,
-                    $item->title,
-                    $_SESSION['user_id'],
-                    $_SESSION['username'],
-                    $bidAmount
-                );
+                if ($item->owner_id != $_SESSION['user_id']) {
+                    Notification::createBidNotification(
+                        $item->owner_id,
+                        $itemId,
+                        $item->title,
+                        $_SESSION['user_id'],
+                        $_SESSION['username'],
+                        $bidAmount
+                    );
+                }
+
+                if ($previousBidderId && $previousBidderId != $_SESSION['user_id']) {
+                    Notification::createOutbidNotification(
+                        $previousBidderId,
+                        $itemId,
+                        $item->title,
+                        $bidAmount,
+                        $_SESSION['user_id']
+                    );
+                }
+
+                header("Location: /items/{$itemId}");
+                exit;
+
+            } catch (Exception $e) {
+                require_once __DIR__ . '/../../includes/utils.php';
+                Logger::error(basename(__FILE__), "Failed to place bid on item {$itemId}", $e->getMessage());
+                
+                $_SESSION['invalidBid'] = true;
+                header("Location: /items/{$itemId}");
+                exit;
             }
-
-            // Notify previous highest bidder that they were outbid (if exists and not the current bidder)
-            if ($previousBidderId && $previousBidderId != $_SESSION['user_id']) {
-                Notification::createOutbidNotification(
-                    $previousBidderId,
-                    $itemId,
-                    $item->title,
-                    $bidAmount,
-                    $_SESSION['user_id']
-                );
-            }
-
-            header("Location: /items/{$itemId}");
-            exit;
         }
     }
 
@@ -81,3 +85,4 @@ class BidController {
         exit;
     }
 }
+?>
