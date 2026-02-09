@@ -195,7 +195,6 @@ class Item {
         return $items;
     }
 
-    // Fetch all comments for this item with user info
     public static function getComments($itemId) {
         $mysqli = self::getDb();
         $stmt = $mysqli->prepare("
@@ -266,7 +265,6 @@ class Item {
             ];
         }
 
-        // No bids yet
         return null;
     }
 }

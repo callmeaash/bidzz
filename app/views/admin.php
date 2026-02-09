@@ -241,10 +241,33 @@
             font-size: 18px;
             color: #666;
             padding: 8px;
+            transition: all 0.2s;
+            border-radius: 6px;
         }
 
         .icon-btn:hover {
             color: #333;
+            background-color: #f0f0f0;
+        }
+
+        .icon-btn.end-item {
+            opacity: 1;
+        }
+
+        .icon-btn.end-item:hover:not(:disabled) {
+            color: #f59e0b;
+            background-color: #fffbeb;
+        }
+
+        .icon-btn.end-item:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        .icon-btn.end-item:disabled:hover {
+            background-color: transparent;
+            color: #999;
         }
 
         .badge {
@@ -564,7 +587,6 @@
     </nav>
 
     <div class="content">
-        <!-- Overview View -->
         <div id="overviewView" class="view">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -646,7 +668,6 @@
             </div>
         </div>
 
-        <!-- All Auctions View -->
         <div id="auctionsView" class="view hidden">
             <div class="section">
                 <h2 style="margin-bottom: 16px;">All Auctions</h2>
@@ -669,13 +690,13 @@
                     <div class="item-actions">
                         <button class="icon-btn"><a href="/items/<?= $item->id ?>"><i class="fa-regular fa-eye"> </a></i></button>
                         <button class="icon-btn delete-item" data-itemid="<?= $item->id ?>"><i class="fa-solid fa-trash" style="color:red;"></i></button>
+                        <button class="icon-btn end-item <?= !$item->is_active ? 'disabled' : '' ?>" data-itemid="<?= $item->id ?>" <?= !$item->is_active ? 'disabled' : '' ?> title="<?= !$item->is_active ? 'Auction already ended' : 'End auction' ?>"><i class="fa-solid fa-stop" style="color:#f59e0b;"></i></button>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
-        <!-- Reports View -->
         <div id="reportsView" class="view hidden">
             <div class="section">
                 <h2 style="margin-bottom: 20px;">Reported Auctions</h2>
@@ -783,7 +804,6 @@
     </div>
 
     <script>
-        // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -795,7 +815,6 @@
             });
         });
 
-        // Show report detail view
         document.querySelectorAll('.report-item').forEach(item => {
             item.addEventListener('click', () => {
                 const details = item.nextElementSibling;
@@ -804,16 +823,13 @@
                 });
         });
         
-        // Resolve report
         function resolveReport() {
             if (confirm('Are you sure you want to resolve this report?')) {
                 alert('Report resolved successfully!');
-                // Update report count
                 const reportCountSpan = document.getElementById('reportCount');
                 reportCountSpan.textContent = '(1)';
                 document.querySelector('[data-view="reports"]').innerHTML = 'Reports <span id="reportCount">(1)</span>';
                 
-                // Switch to overview
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelector('[data-view="overview"]').classList.add('active');
                 document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -824,11 +840,11 @@
         document.getElementById('usersView').addEventListener('click', function (e) {
             const btn = e.target.closest('.userStatusBtn');
             if (!btn) return;
-
+            if (!confirm('Are you sure you want to change user active status?')) return;
             const userId = btn.dataset.userid;
             const formData = new FormData();
             formData.append('user_id', userId);
-
+            
             fetch('/admin/toggle-user-status', {
                 method: 'POST',
                 body: formData
@@ -857,31 +873,32 @@
 
         document.getElementById('usersView').addEventListener('click', function (e) {
             const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                const userItem = deleteBtn.closest('.user-item');
-                const userId = deleteBtn.dataset.userid;
+            if (!deleteBtn) return;
+            if (!confirm('Are you sure you want to delete this user?')) return;
 
-                fetch(`/admin/delete-user/${userId}`, {
-                    method: 'DELETE'
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        userItem.remove();
-                    }
-                    else {
-                        alert(data.message || 'Failed to delete the user');
-                    }
-                })
-                .catch(() => {
-                    alert("Failed to delete the user");
-                });
-            }
+            const userItem = deleteBtn.closest('.user-item');
+            const userId = deleteBtn.dataset.userid;
+            fetch(`/admin/delete-user/${userId}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    userItem.remove();
+                }
+                else {
+                    alert(data.message || 'Failed to delete the user');
+                }
+            })
+            .catch(() => {
+                alert("Failed to delete the user");
+            });
         });
 
         document.getElementById('auctionsView').addEventListener('click', function (e) {
             const deleteBtn = e.target.closest('.delete-item');
-            if (deleteBtn) {
+            if (deleteBtn) {;
+            if (!confirm('Are you sure you want to delete this auction?')) return; 
                 const item = deleteBtn.closest('.auction-item');
                 const itemId = deleteBtn.dataset.itemid;
 
@@ -894,18 +911,49 @@
                         item.remove();
                     }
                     else {
-                        alert(data.message || 'Failed to delete the user');
+                        alert(data.message || 'Failed to delete the item');
                     }
                 })
                 .catch(() => {
-                    alert("Failed to delete the user");
+                    alert("Failed to delete the item");
                 });
+            }
+            const endBtn = e.target.closest('.end-item');
+            if (endBtn && !endBtn.disabled) {
+                const item = endBtn.closest('.auction-item');
+                const itemId = endBtn.dataset.itemid;
+
+                if (confirm('Are you sure you want to end this auction immediately?')) {
+                    fetch(`/admin/end-auction/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.success) {
+                            const badge = item.querySelector('.badge');
+                            badge.textContent = 'Inactive';
+                            endBtn.disabled = true;
+                            endBtn.classList.add('disabled');
+                            endBtn.title = 'Auction already ended';
+                            alert('Auction ended successfully!');
+                        } else {
+                            alert(data.message || 'Failed to end the auction');
+                        }
+                    })
+                    .catch(() => {
+                        alert("Failed to end the auction");
+                    });
+                }
             }
         });
 
         document.getElementById('reportsView').addEventListener('click', function (e) {
             const resolveBtn = e.target.closest('.resolve-btn');
-            if (resolveBtn) {
+            if (!resolveBtn) return;
                 
                 const reportActions = resolveBtn.closest('.report-actions');
                 const reportId = resolveBtn.dataset.reportid;
@@ -937,7 +985,6 @@
                 .catch(() => {
                     alert("Failed to resolve the error");
                 });
-            }
         });
 
 

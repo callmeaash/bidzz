@@ -162,6 +162,9 @@ switch($segments[0]){
         elseif ($action == 'logout') {
             (new AdminController())->logout();
         }
+        elseif ($action == 'end-auction') {
+            (new AdminController())->endAuction($Id);
+        }
         else {
             (new AdminController())->handle();
         }

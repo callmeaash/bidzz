@@ -281,7 +281,6 @@ async function renderNotifications() {
     
     const res = await fetch('/notifications/get-notifications');
     let notificationsData = await res.json();
-    console.log(notificationsData[0])
 
     if (notificationsData.length === 0) {
         document.getElementById('notificationBadge').style.display = 'none';

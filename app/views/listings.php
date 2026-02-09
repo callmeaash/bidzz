@@ -237,7 +237,6 @@
             font-weight: 600;
         }
 
-        /* Confirmation Dialog Styles */
         .confirm-dialog-overlay {
             position: fixed;
             top: 0;
@@ -490,11 +489,13 @@
 
                     <div class='btn-container'>
                         <div>
-                            <a href="/items/<?= $item->id ?>" class="btn btn-outline">👁 View Item</a>
+                            <a href="/items/<?= $item->id ?>" class="btn btn-outline"><i class="fa-regular fa-eye"></i> View Item</a>
                         </div>
+                        <?php if ($item->getBidsCount() == 0): ?>
                         <div>
                             <a data-id="<?= $item->id ?>" class="btn btn-outline deleteBtn" onclick="deleteItem(event, <?= $item->id ?>)"><i class="fa-solid fa-trash" style="color:red;"></i> Delete</a>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -544,7 +545,6 @@
                 confirmCallback = null;
             };
 
-            // Close on overlay click
             overlay.onclick = (e) => {
                 if (e.target === overlay) {
                     overlay.classList.remove('active');
