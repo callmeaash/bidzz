@@ -53,6 +53,7 @@ switch($segments[0]){
         $itemId = $segments[1] ?? null;
         $action = $segments[2] ?? null;
         
+        
         if ($action === 'bid') {
             require_once __DIR__ . '/../app/controllers/bidController.php';
             (new BidController())->handle($itemId);
@@ -67,6 +68,17 @@ switch($segments[0]){
         } elseif ($action === 'report') {
              require_once __DIR__ . '/../app/controllers/reportController.php';
             (new reportController())->handle($itemId);
+        }
+        elseif ($action === 'edit') {
+            require_once __DIR__ . '/../includes/auth.php';
+            requireLogin();
+            require_once __DIR__ . '/../app/controllers/editItemController.php';
+            (new EditItemController())->handleEdit($itemId);
+        } elseif ($action === 'update') {
+            require_once __DIR__ . '/../includes/auth.php';
+            requireLogin();
+            require_once __DIR__ . '/../app/controllers/editItemController.php';
+            (new EditItemController())->handleUpdate($itemId);
         } else {
             require_once __DIR__ . '/../app/controllers/itemController.php';
             (new ItemController())->handle($itemId);

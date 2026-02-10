@@ -405,7 +405,7 @@ document.addEventListener('click', (e) => {
 renderNotifications();
 setInterval(() => {
     renderNotifications();
-}, 30000);
+}, 5000);
 
 document.getElementById('notificationList').addEventListener('click', e => {
     const item = e.target.closest('.notification-item');
@@ -437,6 +437,6 @@ function closeFlash() {
 document.addEventListener('DOMContentLoaded', function() {
     const flash = document.getElementById('flashMessage');
     if (flash) {
-        setTimeout(() => closeFlash(), 5000);
+        setTimeout(() => closeFlash(), 2000);
     }
 });

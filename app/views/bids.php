@@ -487,7 +487,7 @@
                     <h3>Active Bids</h3>
                     <div class="stat-icon"><i class="fa-regular fa-clock" style="color:blue;"></i></div>
                 </div>
-                <div class="stat-value">3</div>
+                <div class="stat-value"><?= count($items) ?></div>
                 <div class="stat-description"><?= $winning ?> winning, <?= $outbid ?> outbid</div>
             </div>
 

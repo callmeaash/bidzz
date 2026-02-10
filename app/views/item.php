@@ -476,39 +476,32 @@
         const submitBtn = document.getElementById('submitBtn');
         const radioButtons = document.querySelectorAll('input[name="reason"]');
 
-        // Show dialog when report button is clicked
         if (reportBtn) {
             reportBtn.addEventListener('click', () => {
                 reportDialog.style.display = 'flex';
             });
         }
 
-        // Close dialog function
         function closeDialog() {
             reportDialog.style.display = 'none';
-            // Reset form
             document.getElementById('reportForm').reset();
             submitBtn.disabled = true;
         }
 
-        // Close dialog when X button is clicked
         if (closeDialogBtn) {
             closeDialogBtn.addEventListener('click', closeDialog);
         }
 
-        // Close dialog when Cancel button is clicked
         if (cancelBtn) {
             cancelBtn.addEventListener('click', closeDialog);
         }
 
-        // Close dialog when clicking outside the dialog box
         reportDialog.addEventListener('click', (e) => {
             if (e.target === reportDialog) {
                 closeDialog();
             }
         });
 
-        // Enable submit button when any radio is selected
         radioButtons.forEach(radio => {
             radio.addEventListener('change', function() {
                 submitBtn.disabled = false;
@@ -537,7 +530,6 @@
                     const data = await response.json();
 
                     if (!response.ok) {
-                        // Server returned an error
                         alert(`Error: ${data.message || 'Failed to submit report'}`);
                         return;
                     }

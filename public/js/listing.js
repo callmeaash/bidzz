@@ -72,7 +72,9 @@ function displayImage(file) {
 
 function removeImage() {
     uploadedImageFile = null;
-    document.getElementById('imageInput').value = '';
+    const input = document.getElementById('imageInput');
+    input.value = '';
+    input.dataset.hasExistingImage = "0";
     document.getElementById('imageUploadArea').style.display = 'block';
     document.getElementById('imagePreviewContainer').innerHTML = '';
 }
@@ -85,6 +87,8 @@ document.getElementById('listing-form').addEventListener('submit', function(e) {
     const category = document.getElementById('category').value;
     const startingBid = document.getElementById('startingBid').value.trim();
     const duration = document.getElementById('duration').value;
+    const imageInput = document.getElementById('imageInput');
+    const hasExistingImage = imageInput.dataset.hasExistingImage === "1";
 
     let isValid = true;
 
@@ -123,7 +127,7 @@ document.getElementById('listing-form').addEventListener('submit', function(e) {
         clearValidation('startingBid');
     }
 
-    if (!uploadedImageFile) {
+    if (!uploadedImageFile && !hasExistingImage) {
         showError('image', '✗ Please upload an image');
         isValid = false;
     }

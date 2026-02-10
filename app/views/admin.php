@@ -702,6 +702,7 @@
                 <h2 style="margin-bottom: 20px;">Reported Auctions</h2>
                 
                 <?php foreach($reports as $report): ?>
+                <div class="report-container" style="margin-bottom: 20px;">
                 <div class="report-item" style="cursor: pointer; background: #f9fafb;"">
                     <i class="fas fa-flag" style="font-size: 20px; color: #dc2626;"></i>
                     <div class="item-content">
@@ -755,6 +756,7 @@
                             <i class="fas fa-check"></i>
                             Resolve
                         </button>
+                    </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -818,9 +820,16 @@
         document.querySelectorAll('.report-item').forEach(item => {
             item.addEventListener('click', () => {
                 const details = item.nextElementSibling;
-                    if (!details || !details.classList.contains('report-details')) return;
-                    details.classList.toggle('hidden');
+                if (!details || !details.classList.contains('report-details')) return;
+                                    
+                document.querySelectorAll('.report-details').forEach(detail => {
+                    if (detail !== details) {
+                        detail.classList.add('hidden');
+                    }
                 });
+                                    
+                details.classList.toggle('hidden');
+            });
         });
         
         function resolveReport() {

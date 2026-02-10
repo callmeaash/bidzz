@@ -87,16 +87,26 @@ class AdminController {
     }
 
     public function endAuction($itemId) {
+        global $mysqli;
 
         $item = Item::findById($itemId);
 
-        $itemName = $item['title'];
-        $ownerId  = (int)$item['owner_id'];
+        if (!$item) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Item not found'
+            ]);
+            return;
+        }
+
+        $itemName = $item->title;
+        $ownerId  = $item->owner_id;
 
         try {
             $highestBid = Item::getHighestBid($itemId);
-            $winnerId = (int) $highestBid['user_id'] ?? null;
-            $finalBid = (float) $highestBid['bid'] ?? null;
+            $winnerId = $highestBid ? (int) $highestBid['user_id'] : null;
+            $finalBid = $highestBid ? (float) $highestBid['bid'] : null;
+            
             $updateSql = "
                 UPDATE items
                 SET is_active = 0,
@@ -108,7 +118,7 @@ class AdminController {
 
             $updateStmt = $mysqli->prepare($updateSql);
             if (!$updateStmt) {
-                throw new Exception("Prepare failed (update)");
+                throw new Exception("Prepare failed (update): " . $mysqli->error);
             }
 
             $updateStmt->bind_param("idi", $winnerId, $finalBid, $itemId);
@@ -124,9 +134,9 @@ class AdminController {
             }
 
             Notification::createAuctionEndedNotification(
-                $item->owner_id,
-                $item->id,
-                $item->title,
+                $ownerId,
+                $itemId,
+                $itemName,
                 $highestBid !== null
             );
 
@@ -145,9 +155,8 @@ class AdminController {
 
             echo json_encode([
                 'success' => false,
-                'message' => 'Failed to end auction'
+                'message' => 'Failed to end auction: ' . $e->getMessage()
             ]);
         }
-
     }
 }

@@ -267,6 +267,28 @@ class Item {
 
         return null;
     }
+
+    public static function update($itemId, $title, $description, $category, $startingBid, $image = null) {
+        $mysqli = self::getDb();
+
+        if ($image) {
+            $stmt = $mysqli->prepare("
+                UPDATE items 
+                SET title = ?, description = ?, category = ?, starting_bid = ?, current_bid = ?, image = ?
+                WHERE id = ?
+            ");
+            $stmt->bind_param("sssddsi", $title, $description, $category, $startingBid, $startingBid, $image, $itemId);
+        } else {
+            $stmt = $mysqli->prepare("
+                UPDATE items 
+                SET title = ?, description = ?, category = ?, starting_bid = ?, current_bid = ?
+                WHERE id = ?
+            ");
+            $stmt->bind_param("sssddi", $title, $description, $category, $startingBid, $startingBid, $itemId);
+        }
+
+        return $stmt->execute();
+    }   
 }
 
 ?>

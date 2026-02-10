@@ -399,6 +399,124 @@
             }
         }
 
+        .flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 500px;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.flash-message.hiding {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.flash-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.flash-error {
+    background-color: #ef4444;
+    color: white;
+}
+
+.flash-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.flash-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.flash-icon::before {
+    font-size: 18px;
+}
+
+.flash-success .flash-icon::before {
+    content: '✓';
+}
+
+.flash-error .flash-icon::before {
+    content: '✗';
+}
+
+.flash-warning .flash-icon::before {
+    content: '⚠';
+}
+
+.flash-info .flash-icon::before {
+    content: 'ℹ';
+}
+
+.flash-text {
+    flex: 1;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .flash-message {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        max-width: none;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -496,6 +614,14 @@
                             <a data-id="<?= $item->id ?>" class="btn btn-outline deleteBtn" onclick="deleteItem(event, <?= $item->id ?>)"><i class="fa-solid fa-trash" style="color:red;"></i> Delete</a>
                         </div>
                         <?php endif; ?>
+
+                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] === $item->owner_id && $item->getBidsCount() === 0 && $item->is_active): ?>
+                        <div>
+                            <a href="/items/<?= $item->id ?>/edit" class="btn btn-outline">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </a>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -503,7 +629,6 @@
         </div>
     </main>
 
-    <!-- Confirmation Dialog -->
     <div class="confirm-dialog-overlay" id="confirmDialogOverlay">
         <div class="confirm-dialog">
             <div class="confirm-dialog-header">
@@ -572,16 +697,13 @@
                         const data = await response.json();
                         
                         if (data.success) {
-                            // Remove the item from DOM
                             const card = document.querySelector(`[data-id="${itemId}"]`);
                             if (card) {
                                 card.remove();
                             }
                             
-                            // Show success message
                             showNotification('Item deleted successfully', 'success');
                             
-                            // Reload page after a short delay to update stats
                             setTimeout(() => {
                                 location.reload();
                             }, 1500);
@@ -606,7 +728,6 @@
             `;
             document.body.appendChild(notification);
             
-            // Auto remove after 3 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.remove();
